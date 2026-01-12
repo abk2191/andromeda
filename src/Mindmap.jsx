@@ -4,14 +4,14 @@ const STORAGE_KEY = "mindmaps";
 
 /* 🎨 Fixed color palette (Notes-style) */
 const NODE_COLORS = [
-  "red", // navy
-  "blue", // slate
-  "green", // gray
-  "greenyellow", // green
-  "gold", // purple
-  "magenta", // maroon
-  "cyan", // olive
-  "#1a1a1a", // dark
+  "#1A1A2E", // Dark navy
+  "#16213E", // Deep blue
+  "#0F3460", // Ocean blue
+  "#533483", // Royal purple
+  "#0D7377", // Dark teal
+  "#393E46", // Charcoal
+  "#222831", // Gunmetal
+  "#323232", // Dark gray
 ];
 
 /* ---------- Helpers ---------- */
