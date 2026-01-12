@@ -40,6 +40,8 @@ export default function Mindmap() {
   const [inputMap, setInputMap] = useState({});
   const [scale, setScale] = useState(1);
 
+  const isDarkTheme = document.body.classList.contains("dark-theme");
+
   /* 🎨 palette open state (single node at a time) */
   const [openColorNode, setOpenColorNode] = useState(null);
 
@@ -137,6 +139,7 @@ export default function Mindmap() {
             onClick={() =>
               setOpenColorNode(openColorNode === node.id ? null : node.id)
             }
+            style={{ color: isDarkTheme ? "white" : "#000033" }} // Adde
           >
             <i class="fa-solid fa-brush"></i>
           </button>
@@ -208,8 +211,10 @@ export default function Mindmap() {
         <div className="in-center">
           <h1
             style={{
-              color: "#000033",
-              textShadow: "0 0 10px #000033, 0 0 20px rgba(255, 255, 255, 0.5)",
+              color: isDarkTheme ? "white" : "#000033", // Added
+              textShadow: isDarkTheme
+                ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
+                : "0 0 10px #000033, 0 0 20px rgba(255, 255, 255, 0.5)", // Added
               fontSize: "45px",
               marginBottom: "15px",
             }}
@@ -264,17 +269,25 @@ export default function Mindmap() {
           <button
             className="zoom-control-buttons"
             onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}
+            style={{ color: isDarkTheme ? "white" : "#000033" }} // Added
           >
-            <i class="fa-solid fa-magnifying-glass-minus"></i>
+            <i className="fa-solid fa-magnifying-glass-minus"></i>
           </button>
-          <button className="zoom-control-buttons" onClick={() => setScale(1)}>
-            <i class="fa-solid fa-arrows-rotate"></i>
+
+          <button
+            className="zoom-control-buttons"
+            onClick={() => setScale(1)}
+            style={{ color: isDarkTheme ? "white" : "#000033" }} // Added
+          >
+            <i className="fa-solid fa-arrows-rotate"></i>
           </button>
+
           <button
             className="zoom-control-buttons"
             onClick={() => setScale((s) => Math.min(2, s + 0.1))}
+            style={{ color: isDarkTheme ? "white" : "#000033" }} // Added
           >
-            <i class="fa-solid fa-magnifying-glass-plus"></i>
+            <i className="fa-solid fa-magnifying-glass-plus"></i>
           </button>
         </div>
       </div>

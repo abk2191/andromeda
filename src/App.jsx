@@ -228,7 +228,10 @@ function App() {
           <Route path="/notes" element={<Notes />} />
           <Route path="/todo" element={<Todo />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/mindmap" element={<Mindmap />} />
+          <Route
+            path="/mindmap"
+            element={<Mindmap lightTheme={lightTheme} />}
+          />
         </Routes>
       </div>
     </Router>
