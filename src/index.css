@@ -28,7 +28,7 @@ html {
 /* Dark theme */
 body.dark-theme,
 html.dark-theme {
-  background-color: #1a1a1a !important;
+  background-color: black !important;
 }
 
 .logo h3 {
