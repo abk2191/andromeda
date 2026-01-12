@@ -164,7 +164,12 @@ export default function Mindmap() {
 
           <input
             value={inputMap[node.id] || ""}
-            style={{ outline: "none" }}
+            style={{
+              outline: "none",
+              background: "transparent",
+              border: "none",
+              color: "white",
+            }}
             onChange={(e) =>
               setInputMap((p) => ({
                 ...p,
@@ -176,7 +181,7 @@ export default function Mindmap() {
 
           <button
             onClick={() => addChild(node.id)}
-            style={{ border: "none", fontSize: "20px" }}
+            style={{ border: "none", fontSize: "20px", background: "none" }}
           >
             <i class="fa-solid fa-plus"></i>
           </button>

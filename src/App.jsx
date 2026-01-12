@@ -41,6 +41,34 @@ function App() {
     }
   }, []);
 
+  /* ---------------- Close Sidebar When Clicking Outside ---------------- */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If sidebar is open and click is outside the sidebar
+      if (
+        isSidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        // Also check if click is not on the hamburger button
+        !event.target.closest(".hamburger")
+      ) {
+        closeSidebar();
+      }
+    };
+
+    // Add event listener when sidebar is open
+    if (isSidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSidebarOpen]);
+
   /* ---------------- Sidebar Logic ---------------- */
   const toggleSidebar = () => {
     if (!isSidebarOpen) {

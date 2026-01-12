@@ -2018,6 +2018,11 @@ html {
   transform: translateY(0);
 }
 
+::placeholder {
+  color: #9ca3af !important; /* Gray 400 */
+  opacity: 1 !important;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,
