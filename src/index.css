@@ -128,11 +128,14 @@ html.dark-theme {
   z-index: 9998;
   transform: translateX(-100%);
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 64px; /* Keep margin-top for navbar */
-  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12),
+    0 5px 5px -3px rgba(0, 0, 0, 0.2);
 }
 
 /* Open animation */
@@ -261,10 +264,14 @@ html.dark-theme {
   font-weight: 500;
   letter-spacing: -0.5px;
   font-family: "Inter", sans-serif;
-  text-shadow: 0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5);
+  text-shadow:
+    0 0 10px #32327a,
+    0 0 20px rgba(255, 255, 255, 0.5);
   color: #32327a;
   font-weight: bold;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
 }
 
 .color-picker {
@@ -327,7 +334,9 @@ html.dark-theme {
 }
 
 .month-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   width: 300px;
   height: 200px;
 }
@@ -348,7 +357,9 @@ html.dark-theme {
 /* Dark theme styles for page-text */
 .dark-theme .page-text h1 {
   color: white !important;
-  text-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5) !important;
+  text-shadow:
+    0 0 10px white,
+    0 0 20px rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Dark theme for year view */
@@ -359,7 +370,9 @@ html.dark-theme {
 .dark-theme .year-header h2,
 .dark-theme .year-header button {
   color: white !important;
-  text-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5) !important;
+  text-shadow:
+    0 0 10px white,
+    0 0 20px rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Dark theme for month cards in year view */
@@ -455,7 +468,9 @@ html.dark-theme {
   letter-spacing: 0.25px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -515,7 +530,9 @@ html.dark-theme {
   letter-spacing: 0.25px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -540,7 +557,8 @@ html.dark-theme {
   padding: 20px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    background-color 0.65s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -691,8 +709,10 @@ html.dark-theme {
   padding: 0;
   border: none;
   border-radius: 8px;
-  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),
-    0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 16px 24px 2px rgba(0, 0, 0, 0.14),
+    0 6px 30px 5px rgba(0, 0, 0, 0.12),
+    0 8px 10px -5px rgba(0, 0, 0, 0.2);
   z-index: 22000;
   width: 90%;
   max-width: 700px;
@@ -921,8 +941,10 @@ html.dark-theme {
   position: fixed; /* Keep as fixed for dynamic positioning */
   z-index: 10000;
   background: white !important;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3),
-    0 0 30px rgba(255, 255, 255, 0.2), 0 0 45px rgba(255, 255, 255, 0.1),
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 0.3),
+    0 0 30px rgba(255, 255, 255, 0.2),
+    0 0 45px rgba(255, 255, 255, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.15);
   animation: jello 0.4s;
   margin-bottom: 45px;
@@ -1072,17 +1094,29 @@ html {
   padding: 0.375em 1em;
   font-weight: 600;
   text-shadow: 0 0.0625em 0 #fff;
-  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
-    0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0, 0 0.3125em 0 0 #dedede,
-    0 0.375em 0 0 #dcdcdc, 0 0.425em 0 0 #cacaca, 0 0.425em 0.5em 0 #cecece;
+  box-shadow:
+    inset 0 0.0625em 0 0 #f4f4f4,
+    0 0.0625em 0 0 #efefef,
+    0 0.125em 0 0 #ececec,
+    0 0.25em 0 0 #e0e0e0,
+    0 0.3125em 0 0 #dedede,
+    0 0.375em 0 0 #dcdcdc,
+    0 0.425em 0 0 #cacaca,
+    0 0.425em 0.5em 0 #cecece;
   transition: 0.15s ease;
   cursor: pointer;
 }
 .styled-btn:active {
   translate: 0 0.225em;
-  box-shadow: inset 0 0.03em 0 0 #f4f4f4, 0 0.03em 0 0 #efefef,
-    0 0.0625em 0 0 #ececec, 0 0.125em 0 0 #e0e0e0, 0 0.125em 0 0 #dedede,
-    0 0.2em 0 0 #dcdcdc, 0 0.225em 0 0 #cacaca, 0 0.225em 0.375em 0 #cecece;
+  box-shadow:
+    inset 0 0.03em 0 0 #f4f4f4,
+    0 0.03em 0 0 #efefef,
+    0 0.0625em 0 0 #ececec,
+    0 0.125em 0 0 #e0e0e0,
+    0 0.125em 0 0 #dedede,
+    0 0.2em 0 0 #dcdcdc,
+    0 0.225em 0 0 #cacaca,
+    0 0.225em 0.375em 0 #cecece;
 }
 
 /*****************************FOR MINDMAP******************************************/
@@ -1112,7 +1146,9 @@ html {
   animation: popIn 0.11s ease-out;
 
   /* ✅ Smooth exit when removed */
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .yes-no-btn-div {
@@ -1248,8 +1284,12 @@ html {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   letter-spacing: 0.3px;
-  transition: background 0.25s ease, box-shadow 0.25s ease, border 0.25s ease,
-    transform 0.15s ease, color 0.3s ease;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    border 0.25s ease,
+    transform 0.15s ease,
+    color 0.3s ease;
 }
 
 .search-input::placeholder {
@@ -1323,8 +1363,10 @@ html {
   padding: 0;
   border: none;
   border-radius: 8px;
-  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),
-    0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 16px 24px 2px rgba(0, 0, 0, 0.14),
+    0 6px 30px 5px rgba(0, 0, 0, 0.12),
+    0 8px 10px -5px rgba(0, 0, 0, 0.2);
   z-index: 9999;
   width: 90%;
   max-width: 700px;
@@ -1618,11 +1660,15 @@ html {
   text-align: center;
   margin-bottom: 3px;
   color: greenyellow;
-  text-shadow: 0 0 10px greenyellow, 0 0 20px rgba(255, 255, 255, 0.5);
+  text-shadow:
+    0 0 10px greenyellow,
+    0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .mood-display {
-  text-shadow: 0 0 10px greenyellow, 0 0 20px rgba(255, 255, 255, 0.5);
+  text-shadow:
+    0 0 10px greenyellow,
+    0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 /* From Uiverse.io by cssbuttons-io */
@@ -1631,8 +1677,8 @@ html {
   border-radius: 130px;
   margin-bottom: 45px;
   padding: 1px 2px;
-  background: linear-gradient(to bottom right, white, rgba(220, 220, 220, 0.5)),
-    white;
+  background:
+    linear-gradient(to bottom right, white, rgba(220, 220, 220, 0.5)), white;
   box-shadow: 0 0 0 2px #fbfbfb;
   cursor: pointer;
   display: flex;
@@ -1670,7 +1716,8 @@ html {
   width: 35px;
   height: 35px;
   border: 1px solid #e5e5e5;
-  background: repeating-radial-gradient(
+  background:
+    repeating-radial-gradient(
       circle at 50% 50%,
       rgba(200, 200, 200, 0.2) 0%,
       rgba(200, 200, 200, 0.2) 2%,
@@ -1713,14 +1760,20 @@ html {
   font-weight: bold;
   font-size: 25px;
   margin-top: 30px;
-  text-shadow: 0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5);
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  text-shadow:
+    0 0 10px #32327a,
+    0 0 20px rgba(255, 255, 255, 0.5);
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
 }
 
 /* Dark theme styles for clock */
 .dark-theme .clock {
   color: white !important;
-  text-shadow: 0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5) !important;
+  text-shadow:
+    0 0 10px white,
+    0 0 20px rgba(255, 255, 255, 0.5) !important;
 }
 
 .theme-holder-main {
@@ -2347,4 +2400,11 @@ body {
 .main-kontainer > * {
   margin-left: auto;
   margin-right: auto;
+}
+
+/* PWA-specific adjustments when app is installed as standalone */
+@media (display-mode: fullscreen) {
+  .name-brand {
+    margin-top: 40px;
+  }
 }
