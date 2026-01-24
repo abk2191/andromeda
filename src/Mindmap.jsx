@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const STORAGE_KEY = "mindmaps";
 
@@ -29,7 +29,7 @@ const createEmptyMap = () => ({
 });
 
 /* ---------- Component ---------- */
-export default function Mindmap() {
+export default function Mindmap({ lightTheme }) {
   const [maps, setMaps] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -40,7 +40,11 @@ export default function Mindmap() {
   const [inputMap, setInputMap] = useState({});
   const [scale, setScale] = useState(1);
 
-  const isDarkTheme = document.body.classList.contains("dark-theme");
+  const [isDarkTheme, setIsDarkTheme] = useState(!lightTheme);
+
+  useEffect(() => {
+    setIsDarkTheme(!lightTheme);
+  }, [lightTheme]);
 
   /* 🎨 palette open state (single node at a time) */
   const [openColorNode, setOpenColorNode] = useState(null);
@@ -107,7 +111,7 @@ export default function Mindmap() {
         .map((n) =>
           n.id === parentId
             ? { ...n, children: [...n.children, newNode.id] }
-            : n
+            : n,
         )
         .concat(newNode),
     }));
@@ -171,7 +175,7 @@ export default function Mindmap() {
               outline: "none",
               background: "transparent",
               border: "none",
-              color: "white",
+              color: isDarkTheme ? "white" : "#000033",
             }}
             onChange={(e) =>
               setInputMap((p) => ({
