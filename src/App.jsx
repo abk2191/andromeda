@@ -212,10 +212,7 @@ function App() {
 
               <div className="name-brand">
                 <h2 style={{ color: "white", fontSize: "20px" }}>
-                  <i className="fa-solid fa-flask"></i> Aphelion Labs.
-                  <p style={{ fontSize: "12px", textAlign: "center" }}>
-                    &copy; All Rights Reserved 2025.
-                  </p>
+                  <i className="fa-solid fa-flask"></i> iINTUIT Labs.
                 </h2>
               </div>
             </div>
