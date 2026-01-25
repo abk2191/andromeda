@@ -125,10 +125,6 @@ function Login() {
           <i className="fa-solid fa-flask"></i> iINTUIT Labs.
         </div>
 
-        <div className="welcome-message">
-          <p>Sign in to sync your data across devices</p>
-        </div>
-
         <div className="google-login-button">
           <button className="login-button" onClick={handleGoogleSignIn}>
             <img
