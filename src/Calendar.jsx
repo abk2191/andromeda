@@ -1,6 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import EventEditor from "./EventEditor";
 import LiveClock from "./LiveClock";
+import {
+  saveAllData,
+  getAllData,
+  saveCalendarData,
+  loadCalendarData,
+  saveCalendarMoods,
+  loadCalendarMoods,
+  saveCalendarDateColors,
+  loadCalendarDateColors,
+  saveCalendarReminders,
+  loadCalendarReminders,
+} from "./firestore-helpers";
 
 function useDarkTheme() {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
@@ -39,6 +51,8 @@ function useDarkTheme() {
 
 function Calendar() {
   const reminderTimeoutsRef = useRef({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   // Load events from localStorage on initial render
   const [event, setEvent] = useState(() => {
     const savedEvents = localStorage.getItem("calendarEvents");
@@ -78,6 +92,145 @@ function Calendar() {
     return savedColors ? JSON.parse(savedColors) : {};
   });
 
+  //********************************************************************/
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { auth, onAuthStateChanged } = await import("./firebase.js");
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("✅ Calendar: User is signed in:", user.email);
+          setIsAuthenticated(true);
+          loadAllCalendarData();
+        } else {
+          console.log("👤 Calendar: No user signed in");
+          setIsAuthenticated(false);
+          loadAllCalendarData();
+        }
+      });
+    };
+    checkAuth();
+  }, []);
+
+  // Load all calendar data from Firestore
+  const loadAllCalendarData = async () => {
+    console.log("🔄 Loading calendar data for current user...");
+
+    try {
+      const loadedEvents = await loadCalendarData();
+      const loadedMoods = await loadCalendarMoods();
+      const loadedDateColors = await loadCalendarDateColors();
+      const loadedReminders = await loadCalendarReminders();
+
+      // Update all states with loaded data
+      setEvent(loadedEvents || []);
+      setMoods(loadedMoods || []);
+      setDateColors(loadedDateColors || {});
+      setReminders(loadedReminders || []);
+
+      console.log("📊 Calendar data loaded:", {
+        events: loadedEvents?.length || 0,
+        moods: loadedMoods?.length || 0,
+        dateColors: loadedDateColors ? Object.keys(loadedDateColors).length : 0,
+        reminders: loadedReminders?.length || 0,
+      });
+    } catch (error) {
+      console.error("Error loading calendar data from Firestore:", error);
+      // Fallback to localStorage
+      const savedEvents = localStorage.getItem("calendarEvents");
+      const savedMoods = localStorage.getItem("calendarMoods");
+      const savedDateColors = localStorage.getItem("calendarDateColors");
+      const savedReminders = localStorage.getItem("calendarReminders");
+
+      if (savedEvents) setEvent(JSON.parse(savedEvents));
+      if (savedMoods) setMoods(JSON.parse(savedMoods));
+      if (savedDateColors) setDateColors(JSON.parse(savedDateColors));
+      if (savedReminders) setReminders(JSON.parse(savedReminders));
+    }
+  };
+
+  // Save events to Firestore when they change
+  useEffect(() => {
+    const saveEvents = async () => {
+      await saveCalendarData(event);
+    };
+    if (event.length > 0) {
+      saveEvents();
+    }
+  }, [event]);
+
+  // Save moods to Firestore when they change
+  useEffect(() => {
+    const saveMoods = async () => {
+      await saveCalendarMoods(moods);
+    };
+    if (moods.length > 0) {
+      saveMoods();
+    }
+  }, [moods]);
+
+  // Save date colors to Firestore when they change
+  useEffect(() => {
+    const saveDateColors = async () => {
+      await saveCalendarDateColors(dateColors);
+    };
+    if (Object.keys(dateColors).length > 0) {
+      saveDateColors();
+    }
+  }, [dateColors]);
+
+  // Save reminders to Firestore when they change
+  useEffect(() => {
+    const saveReminders = async () => {
+      await saveCalendarReminders(reminders);
+    };
+    if (reminders.length > 0) {
+      saveReminders();
+    }
+  }, [reminders]);
+
+  // Add Google sign-in/sign-out functions (similar to Notes/Todos)
+  const handleGoogleSignIn = async () => {
+    try {
+      const { auth, googleProvider, signInWithPopup } =
+        await import("./firebase.js");
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      alert(`Signed in as: ${user.email}`);
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Google sign-in failed:", error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { auth, signOut } = await import("./firebase.js");
+      await signOut(auth);
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Sign out failed:", error);
+    }
+  };
+
+  const handleClearUserData = () => {
+    if (window.confirm("Clear all local calendar data?")) {
+      localStorage.removeItem("calendarEvents");
+      localStorage.removeItem("calendarMoods");
+      localStorage.removeItem("calendarDateColors");
+      localStorage.removeItem("calendarReminders");
+
+      setEvent([]);
+      setMoods([]);
+      setDateColors({});
+      setReminders([]);
+
+      alert("Local calendar data cleared.");
+    }
+  };
+
+  //*******************************************************************/
+
   const isDarkTheme = useDarkTheme();
 
   useEffect(() => {
@@ -95,7 +248,7 @@ function Calendar() {
         0,
         0,
         0,
-        0
+        0,
       );
 
       const msUntilMidnight = midnight - now;
@@ -193,7 +346,7 @@ function Calendar() {
     const lastDayOfCurrentMonth = new Date(
       currentYear,
       currentMonth + 1,
-      0
+      0,
     ).getDate();
 
     // Check if event spans across months
@@ -253,8 +406,8 @@ function Calendar() {
                   endYear: nextYear,
                   spansMonths: true,
                 }
-              : ev
-          )
+              : ev,
+          ),
         );
         setEditingEvent(null);
       } else {
@@ -293,7 +446,7 @@ function Calendar() {
       }
 
       const dateKeys = eventDates.map(
-        (date) => `${currentYear}-${currentMonth + 1}-${date}`
+        (date) => `${currentYear}-${currentMonth + 1}-${date}`,
       );
 
       // Calculate total days
@@ -317,8 +470,8 @@ function Calendar() {
                   dateKeys: dateKeys,
                   spansMonths: false,
                 }
-              : ev
-          )
+              : ev,
+          ),
         );
         setEditingEvent(null);
       } else {
@@ -371,7 +524,7 @@ function Calendar() {
           });
 
           setReminders((prev) =>
-            prev.map((r) => (r.id === reminder.id ? { ...r, fired: true } : r))
+            prev.map((r) => (r.id === reminder.id ? { ...r, fired: true } : r)),
           );
         } catch (err) {
           console.error("Reminder error:", err);
@@ -427,7 +580,7 @@ function Calendar() {
       hh,
       mm,
       0,
-      0
+      0,
     );
 
     const fireAt = fireDate.getTime();
@@ -463,7 +616,7 @@ function Calendar() {
 
     if (Notification.permission === "denied") {
       alert(
-        "You have blocked notifications for this site in browser settings."
+        "You have blocked notifications for this site in browser settings.",
       );
       return false;
     }
@@ -787,7 +940,7 @@ function Calendar() {
     // Filter events for the selected date - check if date is in eventDates
     const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
     const eventsForSelectedDate = event.filter(
-      (item) => item.dateKeys && item.dateKeys.includes(dateKey)
+      (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
     // ADD THIS LINE: Get mood for selected date
@@ -805,7 +958,7 @@ function Calendar() {
     console.log("Date key:", dateKey);
 
     const remindersForDate = reminders.filter(
-      (r) => r.dateKey === dateKey && !r.fired
+      (r) => r.dateKey === dateKey && !r.fired,
     );
 
     return (
@@ -1410,7 +1563,7 @@ function Calendar() {
                 // Check if has event
                 const dateKey = `${year}-${monthData.monthNumber + 1}-${date}`;
                 const hasEvent = event.some(
-                  (item) => item.dateKeys && item.dateKeys.includes(dateKey)
+                  (item) => item.dateKeys && item.dateKeys.includes(dateKey),
                 );
 
                 return (
@@ -1481,7 +1634,7 @@ function Calendar() {
 
     // Check if any event includes this date in its dateKeys array
     return event.some(
-      (item) => item.dateKeys && item.dateKeys.includes(dateKey)
+      (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
   }
 
@@ -1498,7 +1651,7 @@ function Calendar() {
 
     // Check if there's an event for this date
     const hasEventForDate = event.some(
-      (item) => item.dateKeys && item.dateKeys.includes(dateKey)
+      (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
     // ✅ Instantly update UI
@@ -1524,7 +1677,7 @@ function Calendar() {
 
     // If no specific color, check if there's an event for this date
     const eventForDate = event.find(
-      (item) => item.dateKeys && item.dateKeys.includes(dateKey)
+      (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
     // Return default color if there's an event, otherwise transparent
@@ -1589,7 +1742,7 @@ function Calendar() {
   function getEventConnectionInfo(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
     const eventsForDate = event.filter(
-      (item) => item.dateKeys && item.dateKeys.includes(dateKey)
+      (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
     if (eventsForDate.length === 0) {
@@ -1635,15 +1788,15 @@ function Calendar() {
 
     // Check if mood already exists for today
     const existingMoodIndex = moods.findIndex(
-      (item) => item.dateKey === dateKey
+      (item) => item.dateKey === dateKey,
     );
 
     if (existingMoodIndex !== -1) {
       // Update existing mood
       setMoods((prev) =>
         prev.map((m, index) =>
-          index === existingMoodIndex ? { ...m, mood: mood } : m
-        )
+          index === existingMoodIndex ? { ...m, mood: mood } : m,
+        ),
       );
       alert(`Mood updated for today!`);
     } else {
@@ -1690,7 +1843,7 @@ function Calendar() {
 
     // Filter out only the specific event by ID
     setEvent((prevEvents) =>
-      prevEvents.filter((event) => event.id !== eventToDelete)
+      prevEvents.filter((event) => event.id !== eventToDelete),
     );
 
     // NEW: Clear colors for all dates that were part of this event
@@ -1714,7 +1867,7 @@ function Calendar() {
       const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
       const remainingEvents = event.filter(
         (e) =>
-          e.id !== eventToDelete && e.dateKeys && e.dateKeys.includes(dateKey)
+          e.id !== eventToDelete && e.dateKeys && e.dateKeys.includes(dateKey),
       );
 
       // If no events remain for this date, close the event viewer

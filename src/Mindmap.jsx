@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from "react";
+import {
+  saveAllData,
+  getAllData,
+  saveMindmapData,
+  loadMindmapData,
+} from "./firestore-helpers";
 
 const STORAGE_KEY = "mindmaps";
 
@@ -35,6 +41,7 @@ export default function Mindmap({ lightTheme }) {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeMap, setActiveMap] = useState(null);
   const [mode, setMode] = useState("idle");
   const [inputMap, setInputMap] = useState({});
@@ -42,17 +49,100 @@ export default function Mindmap({ lightTheme }) {
 
   const [isDarkTheme, setIsDarkTheme] = useState(!lightTheme);
 
-  useEffect(() => {
-    setIsDarkTheme(!lightTheme);
-  }, [lightTheme]);
-
   /* 🎨 palette open state (single node at a time) */
   const [openColorNode, setOpenColorNode] = useState(null);
 
-  /* ---------- Persistence ---------- */
-  const persistMaps = (updated) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  //******************************************************************/
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { auth, onAuthStateChanged } = await import("./firebase.js");
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("✅ Mindmap: User is signed in:", user.email);
+          setIsAuthenticated(true);
+          loadMindmapsFromFirestore();
+        } else {
+          console.log("👤 Mindmap: No user signed in");
+          setIsAuthenticated(false);
+          loadMindmapsFromFirestore();
+        }
+      });
+    };
+    checkAuth();
+  }, []);
+
+  // Load mindmaps from Firestore
+  const loadMindmapsFromFirestore = async () => {
+    try {
+      const loadedMaps = await loadMindmapData();
+      if (loadedMaps.length > 0) {
+        setMaps(loadedMaps);
+      } else {
+        // Fallback to localStorage
+        const saved = localStorage.getItem(STORAGE_KEY);
+        setMaps(saved ? JSON.parse(saved) : []);
+      }
+    } catch (error) {
+      console.error("Error loading mindmaps from Firestore:", error);
+      // Fallback to localStorage
+      const saved = localStorage.getItem(STORAGE_KEY);
+      setMaps(saved ? JSON.parse(saved) : []);
+    }
   };
+
+  // Update persistMaps to save to Firestore
+  const persistMaps = async (updated) => {
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+    // Save to Firestore
+    try {
+      await saveMindmapData(updated);
+      console.log("✅ Mindmaps saved to Firestore");
+    } catch (error) {
+      console.error("Error saving mindmaps to Firestore:", error);
+    }
+  };
+
+  // Add Google sign-in/sign-out functions
+  const handleGoogleSignIn = async () => {
+    try {
+      const { auth, googleProvider, signInWithPopup } =
+        await import("./firebase.js");
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      alert(`Signed in as: ${user.email}`);
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Google sign-in failed:", error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { auth, signOut } = await import("./firebase.js");
+      await signOut(auth);
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Sign out failed:", error);
+    }
+  };
+
+  const handleClearUserData = () => {
+    if (window.confirm("Clear all local mindmap data?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      setMaps([]);
+      setActiveMap(null);
+      alert("Local mindmap data cleared.");
+    }
+  };
+
+  //******************************************************************/
+
+  useEffect(() => {
+    setIsDarkTheme(!lightTheme);
+  }, [lightTheme]);
 
   /* ---------- Map Actions ---------- */
   const startNewMap = () => {
@@ -143,7 +233,7 @@ export default function Mindmap({ lightTheme }) {
             onClick={() =>
               setOpenColorNode(openColorNode === node.id ? null : node.id)
             }
-            style={{ color: isDarkTheme ? "white" : "#000033" }} // Adde
+            style={{ color: isDarkTheme ? "white" : "#000033" }} // Added
           >
             <i class="fa-solid fa-brush"></i>
           </button>

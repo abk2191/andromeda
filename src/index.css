@@ -2076,6 +2076,65 @@ html {
   opacity: 1 !important;
 }
 
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: whitesmoke;
+}
+
+.login-page-brand-name {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  text-align: center;
+  margin-top: 120px;
+}
+
+.google-login-button {
+  margin-top: 300px;
+}
+
+.brand {
+  margin-top: 40px;
+}
+
+.login-button {
+  height: 60px;
+  width: 300px;
+  border-radius: 40px;
+  border: 1px solid gray;
+  cursor: pointer;
+  font-size: 20px;
+  color: #000033;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sign-out {
+  width: 100%;
+  background-color: #32327a;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 20px;
+}
+
+.sign-out-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sign-out-btn i {
+  color: white;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,
