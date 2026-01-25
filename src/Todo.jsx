@@ -1,42 +1,278 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+import { saveAllData, getAllData } from "./firestore-helpers";
 
 function Todo() {
-  // Load todos from localStorage on initial render
+  // Load todos from Firestore on initial render
+  const [renderDeleteWarning, setRenderDeleteWarning] = useState(false);
+  const [todoToDelete, setTodoToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [todos, setTodos] = useState(() => {
-    const savedTodos = localStorage.getItem("todos");
-    return savedTodos ? JSON.parse(savedTodos) : [];
+    // Initial empty state - will load from Firestore in useEffect
+    return [];
   });
 
-  const [renderDeleteWarning, setRenderDeleteWarning] = useState(false);
-  const [todoToDelete, setTodoToDelete] = useState(null); // Store which todo to delete
+  const [colorSelectorPosition, setColorSelectorPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
+  const [hex, setHex] = useState("");
+  const [colorSelectorActiveTodoId, setColorSelectorActiveTodoId] =
+    useState(null);
   const [todoActive, setTodoActive] = useState(false);
   const [selectedTodoIndex, setSelectedTodoIndex] = useState(null);
   const [pinnedTodos, setPinnedTodos] = useState(() => {
-    const savedPinnedTodos = localStorage.getItem("pinnedTodos");
-    return savedPinnedTodos ? JSON.parse(savedPinnedTodos) : [];
+    // Initial empty state - will load from Firestore
+    return [];
   });
+
   const [isTodoPinned, setIsTodoPinned] = useState(false);
+  const [todoColors, setTodoColors] = useState(() => {
+    // Initial empty state - will load from Firestore
+    return {};
+  });
 
   // State for editing todo title in modal
   const [editingTitle, setEditingTitle] = useState("");
 
   // Store tasks for each todo (object with todoId as keys)
   const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("todoTasks");
-    return savedTasks ? JSON.parse(savedTasks) : {};
+    // Initial empty state - will load from Firestore
+    return {};
   });
 
-  // Color state management (EXACTLY like Notes.jsx)
-  const [todoColors, setTodoColors] = useState(() => {
-    const savedColors = localStorage.getItem("todoColors");
-    return savedColors ? JSON.parse(savedColors) : {};
-  });
+  //*******************************************************************************/
+  //*******************************************************************************/
 
-  const [colorSelectorActiveTodoId, setColorSelectorActiveTodoId] =
-    useState(null);
+  const handleClearUserData = () => {
+    if (
+      window.confirm(
+        "Clear all local todo data? This won't affect your Google account data.",
+      )
+    ) {
+      localStorage.removeItem("todos");
+      localStorage.removeItem("pinnedTodos");
+      localStorage.removeItem("todoTasks");
+      localStorage.removeItem("todoColors");
+      localStorage.removeItem("last_saved_user");
+      localStorage.removeItem("last_saved_email");
+
+      setTodos([]);
+      setPinnedTodos([]);
+      setTasks({});
+      setTodoColors({});
+
+      alert("Local data cleared. Sign in again to load from Google.");
+    }
+  };
+
+  // Google sign-in function
+  const handleGoogleSignIn = async () => {
+    try {
+      console.log("🔐 Attempting Google sign-in...");
+
+      // Import dynamically to avoid circular dependencies
+      const { auth, googleProvider, signInWithPopup } =
+        await import("./firebase.js");
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      console.log("✅ Google sign-in successful!");
+      console.log("📧 Email:", user.email);
+      console.log("👤 Name:", user.displayName);
+      console.log("🆔 UID:", user.uid);
+
+      alert(`Signed in as: ${user.email}`);
+
+      // Reload to refresh authentication state
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Google sign-in failed:", error);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+
+      if (error.code === "auth/popup-blocked") {
+        alert("Please allow popups for Google sign-in");
+      } else if (error.code === "auth/popup-closed-by-user") {
+        console.log("User closed the sign-in popup");
+      } else {
+        alert(`Sign-in failed: ${error.message}`);
+      }
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { auth, signOut } = await import("./firebase.js");
+      await signOut(auth);
+      console.log("✅ Signed out successfully");
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Sign out failed:", error);
+    }
+  };
+
+  // Auth state check
+  useEffect(() => {
+    const checkAuth = async () => {
+      // Import from the correct module
+      const { auth, onAuthStateChanged } = await import("./firebase.js");
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("✅ User is signed in:", user.email);
+          console.log("👤 User ID:", user.uid);
+          console.log("🔍 Is anonymous:", user.isAnonymous);
+
+          // Load data for the current user
+          loadAllDataFromFirestore();
+        } else {
+          console.log("👤 No user signed in");
+          // Load from localStorage for anonymous user
+          loadAllDataFromFirestore();
+        }
+      });
+    };
+    checkAuth();
+  }, []);
+
+  // Update this function to use getAllData properly:
+  const loadAllDataFromFirestore = async () => {
+    console.log("🔄 Loading todo data for current user...");
+
+    try {
+      const loadedTodos = await getAllData("todos");
+      const loadedPinnedTodos = await getAllData("pinnedTodos");
+      const loadedTodoTasks = await getAllData("todoTasks");
+      const loadedTodoColors = await getAllData("todoColors");
+
+      setTodos(loadedTodos || []);
+      setPinnedTodos(loadedPinnedTodos || []);
+      setTasks(loadedTodoTasks || {});
+      setTodoColors(loadedTodoColors || {});
+
+      console.log("📊 Loaded:", {
+        todos: loadedTodos?.length || 0,
+        pinned: loadedPinnedTodos?.length || 0,
+        tasks: loadedTodoTasks ? Object.keys(loadedTodoTasks).length : 0,
+        colors: loadedTodoColors ? Object.keys(loadedTodoColors).length : 0,
+      });
+    } catch (error) {
+      console.error("Error loading todo data:", error);
+    }
+  };
+  //*******************************************************************************/
+  //*******************************************************************************/
+
+  // Load all data from Firestore on component mount
+  useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        // Load todos
+        const loadedTodos = await getAllData("todos");
+        if (loadedTodos.length > 0) {
+          setTodos(loadedTodos);
+        } else {
+          // Fallback to localStorage if no data in Firestore
+          const savedTodos = localStorage.getItem("todos");
+          if (savedTodos) {
+            setTodos(JSON.parse(savedTodos));
+          }
+        }
+
+        // Load pinned todos
+        const loadedPinnedTodos = await getAllData("pinnedTodos");
+        if (loadedPinnedTodos.length > 0) {
+          setPinnedTodos(loadedPinnedTodos);
+        } else {
+          const savedPinnedTodos = localStorage.getItem("pinnedTodos");
+          if (savedPinnedTodos) {
+            setPinnedTodos(JSON.parse(savedPinnedTodos));
+          }
+        }
+
+        // Load todo tasks
+        const loadedTodoTasks = await getAllData("todoTasks");
+        if (loadedTodoTasks && Object.keys(loadedTodoTasks).length > 0) {
+          setTasks(loadedTodoTasks);
+        } else {
+          const savedTasks = localStorage.getItem("todoTasks");
+          if (savedTasks) {
+            setTasks(JSON.parse(savedTasks));
+          }
+        }
+
+        // Load todo colors
+        const loadedTodoColors = await getAllData("todoColors");
+        if (loadedTodoColors && Object.keys(loadedTodoColors).length > 0) {
+          setTodoColors(loadedTodoColors);
+        } else {
+          const savedColors = localStorage.getItem("todoColors");
+          if (savedColors) {
+            setTodoColors(JSON.parse(savedColors));
+          }
+        }
+      } catch (error) {
+        console.error("Error loading data from Firestore:", error);
+        // Fallback to localStorage
+        const savedTodos = localStorage.getItem("todos");
+        const savedPinnedTodos = localStorage.getItem("pinnedTodos");
+        const savedTasks = localStorage.getItem("todoTasks");
+        const savedColors = localStorage.getItem("todoColors");
+
+        if (savedTodos) setTodos(JSON.parse(savedTodos));
+        if (savedPinnedTodos) setPinnedTodos(JSON.parse(savedPinnedTodos));
+        if (savedTasks) setTasks(JSON.parse(savedTasks));
+        if (savedColors) setTodoColors(JSON.parse(savedColors));
+      }
+    };
+
+    loadAllData();
+  }, []);
+
+  // Save todos to Firestore whenever they change
+  useEffect(() => {
+    const saveTodos = async () => {
+      await saveAllData("todos", todos);
+    };
+
+    if (todos.length > 0) {
+      saveTodos();
+    }
+  }, [todos]);
+
+  // Save pinned todos to Firestore whenever they change
+  useEffect(() => {
+    const savePinnedTodos = async () => {
+      await saveAllData("pinnedTodos", pinnedTodos);
+    };
+
+    if (pinnedTodos.length > 0) {
+      savePinnedTodos();
+    }
+  }, [pinnedTodos]);
+
+  // Save tasks to Firestore whenever they change
+  useEffect(() => {
+    const saveTodoTasks = async () => {
+      await saveAllData("todoTasks", tasks);
+    };
+
+    if (Object.keys(tasks).length > 0) {
+      saveTodoTasks();
+    }
+  }, [tasks]);
+
+  // Save todo colors to Firestore whenever they change
+  useEffect(() => {
+    const saveTodoColors = async () => {
+      await saveAllData("todoColors", todoColors);
+    };
+
+    if (Object.keys(todoColors).length > 0) {
+      saveTodoColors();
+    }
+  }, [todoColors]);
 
   useEffect(() => {
     if (todoActive) {
@@ -52,26 +288,6 @@ function Todo() {
       document.body.style.overflow = "auto";
     };
   }, [todoActive]);
-
-  // Save todoColors to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("todoColors", JSON.stringify(todoColors));
-  }, [todoColors]);
-
-  // Save todos to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
-
-  // Save pinned todos to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("pinnedTodos", JSON.stringify(pinnedTodos));
-  }, [pinnedTodos]);
-
-  // Save tasks to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("todoTasks", JSON.stringify(tasks));
-  }, [tasks]);
 
   function newTodo() {
     // Create a Date object (current time)
@@ -152,24 +368,55 @@ function Todo() {
     setRenderDeleteWarning(true);
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (todoToDelete) {
-      // Delete from both arrays
+      try {
+        // Also remove from Firebase
+        const deleteFromFirebase = async () => {
+          // Note: For simplicity, we're just updating the full arrays
+          // A more optimized approach would delete individual documents
+          await saveAllData(
+            "todos",
+            todos.filter((todo) => todo.id !== todoToDelete),
+          );
+          await saveAllData(
+            "pinnedTodos",
+            pinnedTodos.filter((todo) => todo.id !== todoToDelete),
+          );
+
+          // Remove tasks entry
+          const newTasks = { ...tasks };
+          delete newTasks[todoToDelete];
+          await saveAllData("todoTasks", newTasks);
+
+          // Remove color entry
+          const newColors = { ...todoColors };
+          delete newColors[todoToDelete];
+          await saveAllData("todoColors", newColors);
+        };
+
+        await deleteFromFirebase();
+      } catch (error) {
+        console.error("Error deleting from Firebase:", error);
+        // Continue with local deletion even if Firebase fails
+      }
+
+      // Delete from local state
       setTodos((prevTodos) =>
-        prevTodos.filter((todo) => todo.id !== todoToDelete)
+        prevTodos.filter((todo) => todo.id !== todoToDelete),
       );
       setPinnedTodos((prevPinned) =>
-        prevPinned.filter((todo) => todo.id !== todoToDelete)
+        prevPinned.filter((todo) => todo.id !== todoToDelete),
       );
 
-      // Remove tasks for this todo
+      // Also remove the tasks for this todo
       setTasks((prev) => {
         const newTasks = { ...prev };
         delete newTasks[todoToDelete];
         return newTasks;
       });
 
-      // Remove color for this todo
+      // Also remove the color for this todo
       setTodoColors((prev) => {
         const newColors = { ...prev };
         delete newColors[todoToDelete];
@@ -187,12 +434,25 @@ function Todo() {
   }
 
   // Function to clear all todos
-  function clearAllTodos() {
+  async function clearAllTodos() {
     if (window.confirm("Are you sure you want to delete all todo lists?")) {
+      try {
+        // Clear from Firebase
+        await saveAllData("todos", []);
+        await saveAllData("pinnedTodos", []);
+        await saveAllData("todoTasks", {});
+        await saveAllData("todoColors", {});
+      } catch (error) {
+        console.error("Error clearing from Firebase:", error);
+      }
+
+      // Clear local state
       setTodos([]);
       setPinnedTodos([]);
       setTasks({});
       setTodoColors({});
+
+      // Clear localStorage
       localStorage.removeItem("todos");
       localStorage.removeItem("pinnedTodos");
       localStorage.removeItem("todoTasks");
@@ -202,14 +462,39 @@ function Todo() {
 
   // Filter out pinned todos from regular todos for display
   const unpinnedTodos = todos.filter(
-    (todo) => !pinnedTodos.some((pinnedTodo) => pinnedTodo.id === todo.id)
+    (todo) => !pinnedTodos.some((pinnedTodo) => pinnedTodo.id === todo.id),
   );
 
   // Sort todos by ID in descending order (newest first)
   const sortedUnpinnedTodos = [...unpinnedTodos].sort((a, b) => b.id - a.id);
   const sortedPinnedTodos = [...pinnedTodos].sort((a, b) => b.id - a.id);
 
-  function pinTodo(todoId, e) {
+  function matchesSearch(todo) {
+    if (!searchQuery.trim()) return true; // if empty, show everything
+
+    const query = searchQuery.toLowerCase();
+
+    // Search in todo title
+    const titleText = todo.title.toLowerCase();
+    if (titleText.includes(query)) {
+      return true;
+    }
+
+    // Search in task text
+    const todoTasks = tasks[todo.id] || [];
+    for (const task of todoTasks) {
+      if (task.text.toLowerCase().includes(query)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  const filteredPinnedTodos = sortedPinnedTodos.filter(matchesSearch);
+  const filteredUnpinnedTodos = sortedUnpinnedTodos.filter(matchesSearch);
+
+  async function pinTodo(todoId, e) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -218,14 +503,24 @@ function Todo() {
 
     if (todoToPin && !pinnedTodos.some((todo) => todo.id === todoId)) {
       // Add to pinned todos
-      setPinnedTodos((prev) => [...prev, todoToPin]);
+      const newPinnedTodos = [...pinnedTodos, todoToPin];
+      setPinnedTodos(newPinnedTodos);
 
       // Remove from regular todos array
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId));
+      const newTodos = todos.filter((todo) => todo.id !== todoId);
+      setTodos(newTodos);
+
+      // Save to Firebase
+      try {
+        await saveAllData("todos", newTodos);
+        await saveAllData("pinnedTodos", newPinnedTodos);
+      } catch (error) {
+        console.error("Error saving pin operation to Firebase:", error);
+      }
     }
   }
 
-  function unpinTodo(todoId, e) {
+  async function unpinTodo(todoId, e) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -236,29 +531,51 @@ function Todo() {
 
     if (todoToUnpin) {
       // Remove from pinnedTodos
-      setPinnedTodos((prev) => prev.filter((todo) => todo.id !== todoId));
+      const newPinnedTodos = pinnedTodos.filter((todo) => todo.id !== todoId);
+      setPinnedTodos(newPinnedTodos);
 
       // Add back to todos array
-      setTodos((prevTodos) => [...prevTodos, todoToUnpin]);
+      const newTodos = [...todos, todoToUnpin];
+      setTodos(newTodos);
+
+      // Save to Firebase
+      try {
+        await saveAllData("todos", newTodos);
+        await saveAllData("pinnedTodos", newPinnedTodos);
+      } catch (error) {
+        console.error("Error saving unpin operation to Firebase:", error);
+      }
     }
   }
 
   // Update todo title
-  function updateTodoTitle() {
+  async function updateTodoTitle() {
     if (!editingTitle.trim()) return;
 
     if (isTodoPinned && selectedTodoIndex !== null) {
-      setPinnedTodos((prev) =>
-        prev.map((t, i) =>
-          i === selectedTodoIndex ? { ...t, title: editingTitle } : t
-        )
+      const updatedPinnedTodos = pinnedTodos.map((t, i) =>
+        i === selectedTodoIndex ? { ...t, title: editingTitle } : t,
       );
+      setPinnedTodos(updatedPinnedTodos);
+
+      // Save to Firebase
+      try {
+        await saveAllData("pinnedTodos", updatedPinnedTodos);
+      } catch (error) {
+        console.error("Error saving todo title to Firebase:", error);
+      }
     } else if (selectedTodoIndex !== null) {
-      setTodos((prev) =>
-        prev.map((t, i) =>
-          i === selectedTodoIndex ? { ...t, title: editingTitle } : t
-        )
+      const updatedTodos = todos.map((t, i) =>
+        i === selectedTodoIndex ? { ...t, title: editingTitle } : t,
       );
+      setTodos(updatedTodos);
+
+      // Save to Firebase
+      try {
+        await saveAllData("todos", updatedTodos);
+      } catch (error) {
+        console.error("Error saving todo title to Firebase:", error);
+      }
     }
   }
 
@@ -270,57 +587,104 @@ function Todo() {
     console.log("Color selector triggered for todo:", todoId);
   }
 
-  function changeBackgroundColor(todoId, hex, e) {
+  async function changeBackgroundColor(todoId, hex, e) {
     if (e) {
       e.stopPropagation();
       e.preventDefault();
     }
 
-    setTodoColors((prev) => ({
-      ...prev,
+    // Update the color for this specific todo
+    const newColors = {
+      ...todoColors,
       [todoId]: hex,
-    }));
+    };
 
+    setTodoColors(newColors);
+
+    // Save to Firebase
+    try {
+      await saveAllData("todoColors", newColors);
+    } catch (error) {
+      console.error("Error saving color to Firebase:", error);
+    }
+
+    // Close the color selector
     setColorSelectorActiveTodoId(null);
   }
 
   // Task-related functions
-  function addTask(todoId) {
+  async function addTask(todoId) {
     const newTask = {
       id: Date.now(),
       text: "New Task",
       completed: false,
     };
 
-    setTasks((prev) => ({
-      ...prev,
-      [todoId]: [...(prev[todoId] || []), newTask],
-    }));
+    const newTasks = {
+      ...tasks,
+      [todoId]: [...(tasks[todoId] || []), newTask],
+    };
+
+    setTasks(newTasks);
+
+    // Save to Firebase
+    try {
+      await saveAllData("todoTasks", newTasks);
+    } catch (error) {
+      console.error("Error saving tasks to Firebase:", error);
+    }
   }
 
-  function deleteTask(todoId, taskId) {
-    setTasks((prev) => ({
-      ...prev,
-      [todoId]: (prev[todoId] || []).filter((task) => task.id !== taskId),
-    }));
+  async function deleteTask(todoId, taskId) {
+    const newTasks = {
+      ...tasks,
+      [todoId]: (tasks[todoId] || []).filter((task) => task.id !== taskId),
+    };
+
+    setTasks(newTasks);
+
+    // Save to Firebase
+    try {
+      await saveAllData("todoTasks", newTasks);
+    } catch (error) {
+      console.error("Error saving tasks to Firebase:", error);
+    }
   }
 
-  function toggleTaskCompletion(todoId, taskId) {
-    setTasks((prev) => ({
-      ...prev,
-      [todoId]: (prev[todoId] || []).map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
+  async function toggleTaskCompletion(todoId, taskId) {
+    const newTasks = {
+      ...tasks,
+      [todoId]: (tasks[todoId] || []).map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task,
       ),
-    }));
+    };
+
+    setTasks(newTasks);
+
+    // Save to Firebase
+    try {
+      await saveAllData("todoTasks", newTasks);
+    } catch (error) {
+      console.error("Error saving tasks to Firebase:", error);
+    }
   }
 
-  function updateTaskText(todoId, taskId, newText) {
-    setTasks((prev) => ({
-      ...prev,
-      [todoId]: (prev[todoId] || []).map((task) =>
-        task.id === taskId ? { ...task, text: newText } : task
+  async function updateTaskText(todoId, taskId, newText) {
+    const newTasks = {
+      ...tasks,
+      [todoId]: (tasks[todoId] || []).map((task) =>
+        task.id === taskId ? { ...task, text: newText } : task,
       ),
-    }));
+    };
+
+    setTasks(newTasks);
+
+    // Save to Firebase
+    try {
+      await saveAllData("todoTasks", newTasks);
+    } catch (error) {
+      console.error("Error saving tasks to Firebase:", error);
+    }
   }
 
   // TaskItem component
@@ -401,39 +765,13 @@ function Todo() {
     );
   }
 
-  // Search functionality - NOW SEARCHES BOTH TITLE AND TASK TEXT
-  function matchesSearch(todo) {
-    if (!searchQuery.trim()) return true; // if empty, show everything
-
-    const query = searchQuery.toLowerCase();
-
-    // Search in todo title
-    const titleText = todo.title.toLowerCase();
-    if (titleText.includes(query)) {
-      return true;
-    }
-
-    // Search in task text
-    const todoTasks = tasks[todo.id] || [];
-    for (const task of todoTasks) {
-      if (task.text.toLowerCase().includes(query)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  const filteredPinnedTodos = sortedPinnedTodos.filter(matchesSearch);
-  const filteredUnpinnedTodos = sortedUnpinnedTodos.filter(matchesSearch);
-
   // Get current todo in modal
   const currentTodo =
     isTodoPinned && selectedTodoIndex !== null
       ? pinnedTodos[selectedTodoIndex]
       : !isTodoPinned && selectedTodoIndex !== null
-      ? todos[selectedTodoIndex]
-      : null;
+        ? todos[selectedTodoIndex]
+        : null;
 
   const currentTodoId = currentTodo?.id;
   const currentTodoTasks = currentTodoId ? tasks[currentTodoId] || [] : [];
@@ -447,38 +785,118 @@ function Todo() {
         <div className="wrapper">
           <div className="page-text">
             <h1>TODO</h1>
+            <button
+              onClick={handleClearUserData}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#ff9900",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
+            >
+              Clear Local Data
+            </button>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginTop: "10px",
+                justifyContent: "center",
+              }}
+            >
+              <button
+                onClick={handleGoogleSignIn}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#4285f4",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontWeight: "bold",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 48 48">
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M46.5 24c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                  />
+                </svg>
+                Sign in with Google
+              </button>
+
+              <button
+                onClick={handleSignOut}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#ff4444",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
-        <div className="kontainer">
-          {/* 🔎 Search bar - EXACTLY like Notes.jsx */}
-          <div className="search-div">
-            <input
-              className="search-input"
-              type="text"
-              placeholder="Search todos..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setIsSearching(true); // ✅ ENTER SEARCH MODE
-              }}
-            />
-            {isSearching && (
-              <div style={{ marginTop: "10px" }} className="cls-srch-btn-div">
-                <button
-                  className="cls-srch-btn"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setIsSearching(false); // ✅ EXIT SEARCH MODE
-                  }}
-                >
-                  <i className="fa-solid fa-xmark"></i>
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="crt-nt-btn-div"></div>
 
-          {/* Search Result - EXACTLY like Notes.jsx */}
+        {/* 🔎 Search bar */}
+        <div className="search-div">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Search todos..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setIsSearching(true); // ✅ ENTER SEARCH MODE
+            }}
+          />
+          {isSearching && (
+            <div style={{ marginTop: "10px" }} className="cls-srch-btn-div">
+              <button
+                className="cls-srch-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setIsSearching(false); // ✅ EXIT SEARCH MODE
+                }}
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="kontainer">
+          <div className="crt-nt-btn-div">
+            {/* Add todo button moved to pinned todos section */}
+          </div>
+
+          {/*Search Result*/}
           {isSearching && (
             <div className="notes-list">
               {filteredPinnedTodos.length === 0 &&
@@ -489,7 +907,7 @@ function Todo() {
                   (todo) => {
                     const todoTasks = tasks[todo.id] || [];
                     const completedCount = todoTasks.filter(
-                      (t) => t.completed
+                      (t) => t.completed,
                     ).length;
                     const totalCount = todoTasks.length;
 
@@ -531,13 +949,13 @@ function Todo() {
                         </div>
                       </div>
                     );
-                  }
+                  },
                 )
               )}
             </div>
           )}
 
-          {/* Pinned Todos - EXACT same structure as Notes.jsx */}
+          {/* Pinned Todos - Always show section if there are pinned todos */}
           {!isSearching && (
             <>
               <div className="notes-container">
@@ -546,7 +964,7 @@ function Todo() {
                   style={{ marginBottom: "30px" }}
                 >
                   <button className="add-new-note-button" onClick={newTodo}>
-                    <span class="button_top"> ADD TODO </span>
+                    <span className="button_top"> ADD TODO </span>
                   </button>
                 </div>
 
@@ -565,7 +983,7 @@ function Todo() {
                       {sortedPinnedTodos.map((todo) => {
                         const todoTasks = tasks[todo.id] || [];
                         const completedCount = todoTasks.filter(
-                          (t) => t.completed
+                          (t) => t.completed,
                         ).length;
                         const totalCount = todoTasks.length;
 
@@ -615,7 +1033,7 @@ function Todo() {
                                         changeBackgroundColor(
                                           todo.id,
                                           "#1a1a1a",
-                                          e
+                                          e,
                                         )
                                       }
                                     ></div>
@@ -625,7 +1043,7 @@ function Todo() {
                                         changeBackgroundColor(
                                           todo.id,
                                           "#000033",
-                                          e
+                                          e,
                                         )
                                       }
                                     ></div>
@@ -635,7 +1053,7 @@ function Todo() {
                                         changeBackgroundColor(
                                           todo.id,
                                           "#256025",
-                                          e
+                                          e,
                                         )
                                       }
                                     ></div>
@@ -645,7 +1063,7 @@ function Todo() {
                                         changeBackgroundColor(
                                           todo.id,
                                           "#1a0505",
-                                          e
+                                          e,
                                         )
                                       }
                                     ></div>
@@ -655,7 +1073,7 @@ function Todo() {
                                         changeBackgroundColor(
                                           todo.id,
                                           "#360a5e",
-                                          e
+                                          e,
                                         )
                                       }
                                     ></div>
@@ -665,7 +1083,7 @@ function Todo() {
                                         changeBackgroundColor(
                                           todo.id,
                                           "#43431aff",
-                                          e
+                                          e,
                                         )
                                       }
                                     ></div>
@@ -681,7 +1099,7 @@ function Todo() {
                                       onChange={(e) =>
                                         changeBackgroundColor(
                                           todo.id,
-                                          e.target.value
+                                          e.target.value,
                                         )
                                       }
                                     />
@@ -732,7 +1150,7 @@ function Todo() {
             </>
           )}
 
-          {/* Delete Confirmation Warning Modal - EXACTLY like Notes.jsx */}
+          {/* Delete Confirmation Warning Modal */}
           {renderDeleteWarning && (
             <>
               <div className="backdrop" onClick={cancelDelete}></div>
@@ -773,7 +1191,7 @@ function Todo() {
                 sortedUnpinnedTodos.map((todo) => {
                   const todoTasks = tasks[todo.id] || [];
                   const completedCount = todoTasks.filter(
-                    (t) => t.completed
+                    (t) => t.completed,
                   ).length;
                   const totalCount = todoTasks.length;
 

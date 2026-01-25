@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from "react";
+import { saveAllData, getAllData } from "./firestore-helpers";
 
 function Notes() {
-  // Load notes from localStorage on initial render
+  // Load notes from Firestore on initial render
   const [renderDeleteWarning, setRenderDeleteWarning] = useState(false);
-  const [noteToDelete, setNoteToDelete] = useState(null); // Store which note to delete
+  const [noteToDelete, setNoteToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [notes, setNotes] = useState(() => {
-    const savedNotes = localStorage.getItem("notes");
-    return savedNotes ? JSON.parse(savedNotes) : [];
+    // Initial empty state - will load from Firestore in useEffect
+    return [];
   });
 
   const [colorSelectorPosition, setColorSelectorPosition] = useState({
@@ -22,16 +23,220 @@ function Notes() {
   const [noteActive, setNoteActive] = useState(false);
   const [selectedNoteIndex, setSelectedNoteIndex] = useState(null);
   const [pinnedNotes, setPinnedNotes] = useState(() => {
-    // Load pinned notes in initial state
-    const savedPinnedNotes = localStorage.getItem("pinnedNotes");
-    return savedPinnedNotes ? JSON.parse(savedPinnedNotes) : [];
+    // Initial empty state - will load from Firestore
+    return [];
   });
+
   const [isNotePinned, setIsNotePinned] = useState(false);
   const contentRef = useRef(null);
   const [noteColors, setNoteColors] = useState(() => {
-    const savedColors = localStorage.getItem("noteColors");
-    return savedColors ? JSON.parse(savedColors) : {};
+    // Initial empty state - will load from Firestore
+    return {};
   });
+
+  //*******************************************************************************/
+  //*******************************************************************************/
+
+  const handleClearUserData = () => {
+    if (
+      window.confirm(
+        "Clear all local notes data? This won't affect your Google account data.",
+      )
+    ) {
+      localStorage.removeItem("notes");
+      localStorage.removeItem("pinnedNotes");
+      localStorage.removeItem("noteColors");
+      localStorage.removeItem("last_saved_user");
+      localStorage.removeItem("last_saved_email");
+
+      setNotes([]);
+      setPinnedNotes([]);
+      setNoteColors({});
+
+      alert("Local data cleared. Sign in again to load from Google.");
+    }
+  };
+
+  // In your Notes.jsx - Add this function inside the Notes component:
+  const handleGoogleSignIn = async () => {
+    try {
+      console.log("🔐 Attempting Google sign-in...");
+
+      // Import dynamically to avoid circular dependencies
+      const { auth, googleProvider, signInWithPopup } =
+        await import("./firebase.js");
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      console.log("✅ Google sign-in successful!");
+      console.log("📧 Email:", user.email);
+      console.log("👤 Name:", user.displayName);
+      console.log("🆔 UID:", user.uid);
+
+      alert(`Signed in as: ${user.email}`);
+
+      // Reload to refresh authentication state
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Google sign-in failed:", error);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+
+      if (error.code === "auth/popup-blocked") {
+        alert("Please allow popups for Google sign-in");
+      } else if (error.code === "auth/popup-closed-by-user") {
+        console.log("User closed the sign-in popup");
+      } else {
+        alert(`Sign-in failed: ${error.message}`);
+      }
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { auth, signOut } = await import("./firebase.js");
+      await signOut(auth);
+      console.log("✅ Signed out successfully");
+      window.location.reload();
+    } catch (error) {
+      console.error("❌ Sign out failed:", error);
+    }
+  };
+
+  // Also add this useEffect to check auth state
+  // In Notes.jsx, update the auth check useEffect:
+  useEffect(() => {
+    const checkAuth = async () => {
+      // Import from the correct module
+      const { auth, onAuthStateChanged } = await import("./firebase.js");
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("✅ User is signed in:", user.email);
+          console.log("👤 User ID:", user.uid);
+          console.log("🔍 Is anonymous:", user.isAnonymous);
+
+          // Load data for the current user
+          loadAllDataFromFirestore();
+        } else {
+          console.log("👤 No user signed in");
+          // Load from localStorage for anonymous user
+          loadAllDataFromFirestore();
+        }
+      });
+    };
+    checkAuth();
+  }, []);
+
+  // Update this function to use getAllData properly:
+  const loadAllDataFromFirestore = async () => {
+    console.log("🔄 Loading data for current user...");
+
+    try {
+      const loadedNotes = await getAllData("notes");
+      const loadedPinnedNotes = await getAllData("pinnedNotes");
+      const loadedNoteColors = await getAllData("noteColors");
+
+      setNotes(loadedNotes || []);
+      setPinnedNotes(loadedPinnedNotes || []);
+      setNoteColors(loadedNoteColors || {});
+
+      console.log("📊 Loaded:", {
+        notes: loadedNotes?.length || 0,
+        pinned: loadedPinnedNotes?.length || 0,
+        colors: loadedNoteColors ? Object.keys(loadedNoteColors).length : 0,
+      });
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
+  };
+  //*******************************************************************************/
+  //*******************************************************************************/
+
+  // Load all data from Firestore on component mount
+  useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        // Load notes
+        const loadedNotes = await getAllData("notes");
+        if (loadedNotes.length > 0) {
+          setNotes(loadedNotes);
+        } else {
+          // Fallback to localStorage if no data in Firestore
+          const savedNotes = localStorage.getItem("notes");
+          if (savedNotes) {
+            setNotes(JSON.parse(savedNotes));
+          }
+        }
+
+        // Load pinned notes
+        const loadedPinnedNotes = await getAllData("pinnedNotes");
+        if (loadedPinnedNotes.length > 0) {
+          setPinnedNotes(loadedPinnedNotes);
+        } else {
+          const savedPinnedNotes = localStorage.getItem("pinnedNotes");
+          if (savedPinnedNotes) {
+            setPinnedNotes(JSON.parse(savedPinnedNotes));
+          }
+        }
+
+        // Load note colors
+        const loadedNoteColors = await getAllData("noteColors");
+        if (loadedNoteColors && Object.keys(loadedNoteColors).length > 0) {
+          setNoteColors(loadedNoteColors);
+        } else {
+          const savedColors = localStorage.getItem("noteColors");
+          if (savedColors) {
+            setNoteColors(JSON.parse(savedColors));
+          }
+        }
+      } catch (error) {
+        console.error("Error loading data from Firestore:", error);
+        // Fallback to localStorage
+        const savedNotes = localStorage.getItem("notes");
+        const savedPinnedNotes = localStorage.getItem("pinnedNotes");
+        const savedColors = localStorage.getItem("noteColors");
+
+        if (savedNotes) setNotes(JSON.parse(savedNotes));
+        if (savedPinnedNotes) setPinnedNotes(JSON.parse(savedPinnedNotes));
+        if (savedColors) setNoteColors(JSON.parse(savedColors));
+      }
+    };
+
+    loadAllData();
+  }, []);
+
+  // Save notes to Firestore whenever they change
+  useEffect(() => {
+    const saveNotes = async () => {
+      await saveAllData("notes", notes);
+    };
+
+    if (notes.length > 0) {
+      saveNotes();
+    }
+  }, [notes]);
+
+  // Save pinned notes to Firestore whenever they change
+  useEffect(() => {
+    const savePinnedNotes = async () => {
+      await saveAllData("pinnedNotes", pinnedNotes);
+    };
+
+    if (pinnedNotes.length > 0) {
+      savePinnedNotes();
+    }
+  }, [pinnedNotes]);
+
+  // Save note colors to Firestore whenever they change
+  useEffect(() => {
+    const saveNoteColors = async () => {
+      await saveAllData("noteColors", noteColors);
+    };
+
+    if (Object.keys(noteColors).length > 0) {
+      saveNoteColors();
+    }
+  }, [noteColors]);
 
   useEffect(() => {
     if (noteActive) {
@@ -47,26 +252,6 @@ function Notes() {
       document.body.style.overflow = "auto";
     };
   }, [noteActive]);
-
-  useEffect(() => {
-    localStorage.setItem("noteColors", JSON.stringify(noteColors));
-  }, [noteColors]);
-
-  // Debug: Log pinned notes changes
-  useEffect(() => {
-    console.log("Pinned notes updated:", pinnedNotes);
-  }, [pinnedNotes]);
-
-  // Save notes to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]);
-
-  // Save pinned notes to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("pinnedNotes", JSON.stringify(pinnedNotes));
-    console.log("Saved pinned notes to localStorage:", pinnedNotes);
-  }, [pinnedNotes]);
 
   function newNote() {
     // Create a Date object (current time)
@@ -99,6 +284,7 @@ function Notes() {
       date: dateString,
       time: timeString,
     };
+
     setNotes((prevNotes) => [...prevNotes, newNoteItem]);
   }
 
@@ -147,14 +333,40 @@ function Notes() {
     setRenderDeleteWarning(true);
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (noteToDelete) {
-      // Delete from both arrays
+      try {
+        // Also remove from Firebase
+        const deleteFromFirebase = async () => {
+          // Note: For simplicity, we're just updating the full arrays
+          // A more optimized approach would delete individual documents
+          await saveAllData(
+            "notes",
+            notes.filter((note) => note.id !== noteToDelete),
+          );
+          await saveAllData(
+            "pinnedNotes",
+            pinnedNotes.filter((note) => note.id !== noteToDelete),
+          );
+
+          // Remove color entry
+          const newColors = { ...noteColors };
+          delete newColors[noteToDelete];
+          await saveAllData("noteColors", newColors);
+        };
+
+        await deleteFromFirebase();
+      } catch (error) {
+        console.error("Error deleting from Firebase:", error);
+        // Continue with local deletion even if Firebase fails
+      }
+
+      // Delete from local state
       setNotes((prevNotes) =>
-        prevNotes.filter((note) => note.id !== noteToDelete)
+        prevNotes.filter((note) => note.id !== noteToDelete),
       );
       setPinnedNotes((prevPinned) =>
-        prevPinned.filter((note) => note.id !== noteToDelete)
+        prevPinned.filter((note) => note.id !== noteToDelete),
       );
 
       // Also remove the color for this note
@@ -175,11 +387,23 @@ function Notes() {
   }
 
   // Function to clear all notes
-  function clearAllNotes() {
+  async function clearAllNotes() {
     if (window.confirm("Are you sure you want to delete all notes?")) {
+      try {
+        // Clear from Firebase
+        await saveAllData("notes", []);
+        await saveAllData("pinnedNotes", []);
+        await saveAllData("noteColors", {});
+      } catch (error) {
+        console.error("Error clearing from Firebase:", error);
+      }
+
+      // Clear local state
       setNotes([]);
       setPinnedNotes([]);
       setNoteColors({});
+
+      // Clear localStorage
       localStorage.removeItem("notes");
       localStorage.removeItem("pinnedNotes");
       localStorage.removeItem("noteColors");
@@ -188,7 +412,7 @@ function Notes() {
 
   // Filter out pinned notes from regular notes for display
   const unpinnedNotes = notes.filter(
-    (note) => !pinnedNotes.some((pinnedNote) => pinnedNote.id === note.id)
+    (note) => !pinnedNotes.some((pinnedNote) => pinnedNote.id === note.id),
   );
 
   // Sort notes by ID in descending order (newest first)
@@ -208,7 +432,7 @@ function Notes() {
   const filteredPinnedNotes = sortedPinnedNotes.filter(matchesSearch);
   const filteredUnpinnedNotes = sortedUnpinnedNotes.filter(matchesSearch);
 
-  function pinNote(noteId, e) {
+  async function pinNote(noteId, e) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -217,14 +441,24 @@ function Notes() {
 
     if (noteToPin && !pinnedNotes.some((note) => note.id === noteId)) {
       // Add to pinned notes
-      setPinnedNotes((prev) => [...prev, noteToPin]);
+      const newPinnedNotes = [...pinnedNotes, noteToPin];
+      setPinnedNotes(newPinnedNotes);
 
       // Remove from regular notes array
-      setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+      const newNotes = notes.filter((note) => note.id !== noteId);
+      setNotes(newNotes);
+
+      // Save to Firebase
+      try {
+        await saveAllData("notes", newNotes);
+        await saveAllData("pinnedNotes", newPinnedNotes);
+      } catch (error) {
+        console.error("Error saving pin operation to Firebase:", error);
+      }
     }
   }
 
-  function unpinNote(noteId, e) {
+  async function unpinNote(noteId, e) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -235,10 +469,20 @@ function Notes() {
 
     if (noteToUnpin) {
       // Remove from pinnedNotes
-      setPinnedNotes((prev) => prev.filter((note) => note.id !== noteId));
+      const newPinnedNotes = pinnedNotes.filter((note) => note.id !== noteId);
+      setPinnedNotes(newPinnedNotes);
 
       // Add back to notes array
-      setNotes((prevNotes) => [...prevNotes, noteToUnpin]);
+      const newNotes = [...notes, noteToUnpin];
+      setNotes(newNotes);
+
+      // Save to Firebase
+      try {
+        await saveAllData("notes", newNotes);
+        await saveAllData("pinnedNotes", newPinnedNotes);
+      } catch (error) {
+        console.error("Error saving unpin operation to Firebase:", error);
+      }
     }
   }
 
@@ -249,17 +493,26 @@ function Notes() {
     setColorSelectorActiveNoteId((prev) => (prev === noteId ? null : noteId));
   }
 
-  function changeBackgroundColor(noteId, hex, e) {
+  async function changeBackgroundColor(noteId, hex, e) {
     if (e) {
       e.stopPropagation();
       e.preventDefault();
     }
 
     // Update the color for this specific note
-    setNoteColors((prev) => ({
-      ...prev,
+    const newColors = {
+      ...noteColors,
       [noteId]: hex,
-    }));
+    };
+
+    setNoteColors(newColors);
+
+    // Save to Firebase
+    try {
+      await saveAllData("noteColors", newColors);
+    } catch (error) {
+      console.error("Error saving color to Firebase:", error);
+    }
 
     // Close the color selector
     setColorSelectorActiveNoteId(null);
@@ -271,6 +524,85 @@ function Notes() {
         <div className="wrapper">
           <div className="page-text">
             <h1>NOTES</h1>
+            <button
+              onClick={handleClearUserData}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#ff9900",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
+            >
+              Clear Local Data
+            </button>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginTop: "10px",
+                justifyContent: "center",
+              }}
+            >
+              <button
+                onClick={handleGoogleSignIn}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#4285f4",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontWeight: "bold",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 48 48">
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M46.5 24c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                  />
+                </svg>
+                Sign in with Google
+              </button>
+
+              <button
+                onClick={handleSignOut}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#ff4444",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                }}
+              >
+                Sign Out
+              </button>
+
+              {/* Debug button */}
+            </div>
           </div>
         </div>
 
@@ -302,11 +634,7 @@ function Notes() {
         </div>
         <div className="kontainer">
           <div className="crt-nt-btn-div">
-            {/* <button className="pushable" onClick={newNote}>
-              <span className="shadow"></span>
-              <span className="edge"></span>
-              <span className="front"> ADD NOTE </span>
-            </button> */}
+            {/* Add note button moved to pinned notes section */}
           </div>
 
           {/*Search Result*/}
@@ -339,14 +667,13 @@ function Notes() {
                         </div>
                       </div>
                     </div>
-                  )
+                  ),
                 )
               )}
             </div>
           )}
 
           {/* Pinned Notes - Always show section if there are pinned notes */}
-          {/* Pinned Notes */}
           {!isSearching && (
             <>
               <div className="notes-container">
@@ -355,7 +682,7 @@ function Notes() {
                   style={{ marginBottom: "30px" }}
                 >
                   <button className="add-new-note-button" onClick={newNote}>
-                    <span class="button_top"> ADD NOTE </span>
+                    <span className="button_top"> ADD NOTE </span>
                   </button>
                 </div>
 
@@ -403,7 +730,7 @@ function Notes() {
                                       changeBackgroundColor(
                                         note.id,
                                         "#1a1a1a",
-                                        e
+                                        e,
                                       )
                                     }
                                   ></div>
@@ -413,7 +740,7 @@ function Notes() {
                                       changeBackgroundColor(
                                         note.id,
                                         "#000033",
-                                        e
+                                        e,
                                       )
                                     }
                                   ></div>
@@ -423,7 +750,7 @@ function Notes() {
                                       changeBackgroundColor(
                                         note.id,
                                         "#256025",
-                                        e
+                                        e,
                                       )
                                     }
                                   ></div>
@@ -433,7 +760,7 @@ function Notes() {
                                       changeBackgroundColor(
                                         note.id,
                                         "#1a0505",
-                                        e
+                                        e,
                                       )
                                     }
                                   ></div>
@@ -443,7 +770,7 @@ function Notes() {
                                       changeBackgroundColor(
                                         note.id,
                                         "#360a5e",
-                                        e
+                                        e,
                                       )
                                     }
                                   ></div>
@@ -453,7 +780,7 @@ function Notes() {
                                       changeBackgroundColor(
                                         note.id,
                                         "#646409",
-                                        e
+                                        e,
                                       )
                                     }
                                   ></div>
@@ -469,7 +796,7 @@ function Notes() {
                                     onChange={(e) =>
                                       changeBackgroundColor(
                                         note.id,
-                                        e.target.value
+                                        e.target.value,
                                       )
                                     }
                                   />
@@ -700,24 +1027,31 @@ function Notes() {
                 suppressContentEditableWarning={true}
                 onInput={(e) => {
                   const updatedText = e.target.innerHTML;
+
                   if (isNotePinned) {
                     // Update pinned note
-                    setPinnedNotes((prev) =>
-                      prev.map((n, i) =>
-                        i === selectedNoteIndex
-                          ? { ...n, content: updatedText }
-                          : n
-                      )
+                    const updatedPinnedNotes = pinnedNotes.map((n, i) =>
+                      i === selectedNoteIndex
+                        ? { ...n, content: updatedText }
+                        : n,
+                    );
+                    setPinnedNotes(updatedPinnedNotes);
+
+                    // Save to Firebase
+                    saveAllData("pinnedNotes", updatedPinnedNotes).catch(
+                      console.error,
                     );
                   } else {
                     // Update regular note
-                    setNotes((prev) =>
-                      prev.map((n, i) =>
-                        i === selectedNoteIndex
-                          ? { ...n, content: updatedText }
-                          : n
-                      )
+                    const updatedNotes = notes.map((n, i) =>
+                      i === selectedNoteIndex
+                        ? { ...n, content: updatedText }
+                        : n,
                     );
+                    setNotes(updatedNotes);
+
+                    // Save to Firebase
+                    saveAllData("notes", updatedNotes).catch(console.error);
                   }
                 }}
               ></div>
