@@ -140,7 +140,7 @@ function Login() {
           </button>
         </div>
 
-        <div className="guest-option" style={{ marginTop: "20px" }}>
+        {/* <div className="guest-option" style={{ marginTop: "20px" }}>
           <p style={{ fontSize: "14px", color: "#666" }}>
             Or continue as{" "}
             <a
@@ -151,7 +151,7 @@ function Login() {
             </a>{" "}
             (data saved locally)
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
