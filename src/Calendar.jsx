@@ -98,14 +98,20 @@ function Calendar() {
     const checkAuth = async () => {
       const { auth, onAuthStateChanged } = await import("./firebase.js");
       onAuthStateChanged(auth, (user) => {
-        if (user) {
-          console.log("✅ Calendar: User is signed in:", user.email);
+        if (user && !user.isAnonymous) {
+          console.log("✅ Calendar: User signed in:", user.email, user.uid);
           setIsAuthenticated(true);
-          loadAllCalendarData();
+          loadAllCalendarData(); // Load user-specific data
         } else {
-          console.log("👤 Calendar: No user signed in");
+          console.log("👤 Calendar: No user signed in or anonymous");
           setIsAuthenticated(false);
-          loadAllCalendarData();
+          // Clear data if user signs out
+          if (user === null) {
+            setEvent([]);
+            setMoods([]);
+            setDateColors({});
+            setReminders([]);
+          }
         }
       });
     };

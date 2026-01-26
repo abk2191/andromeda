@@ -107,26 +107,27 @@ function Notes() {
   // In Notes.jsx, update the auth check useEffect:
   useEffect(() => {
     const checkAuth = async () => {
-      // Import from the correct module
       const { auth, onAuthStateChanged } = await import("./firebase.js");
       onAuthStateChanged(auth, (user) => {
-        if (user) {
-          console.log("✅ User is signed in:", user.email);
-          console.log("👤 User ID:", user.uid);
-          console.log("🔍 Is anonymous:", user.isAnonymous);
-
-          // Load data for the current user
-          loadAllDataFromFirestore();
+        if (user && !user.isAnonymous) {
+          console.log("✅ User signed in:", user.email, user.uid);
+          setIsAuthenticated(true);
+          loadAllDataFromFirestore(); // Load user-specific data
         } else {
-          console.log("👤 No user signed in");
-          // Load from localStorage for anonymous user
-          loadAllDataFromFirestore();
+          console.log("👤 No user signed in or anonymous");
+          setIsAuthenticated(false);
+          // Clear data if user signs out
+          if (user === null) {
+            // Optionally clear local state
+            setNotes([]);
+            setPinnedNotes([]);
+            setNoteColors({});
+          }
         }
       });
     };
     checkAuth();
   }, []);
-
   // Update this function to use getAllData properly:
   const loadAllDataFromFirestore = async () => {
     console.log("🔄 Loading data for current user...");

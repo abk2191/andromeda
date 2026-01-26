@@ -68,6 +68,12 @@ function App() {
   /* ---------------- Sign Out Function ---------------- */
   const handleSignOut = async () => {
     try {
+      // Import clearLocalUserData function
+      const { clearLocalUserData } = await import("./firestore-helpers");
+
+      // Clear all local data before signing out
+      clearLocalUserData();
+
       const { auth, signOut } = await import("./firebase.js");
       await signOut(auth);
       setUser(null);

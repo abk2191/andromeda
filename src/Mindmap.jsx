@@ -58,14 +58,18 @@ export default function Mindmap({ lightTheme }) {
     const checkAuth = async () => {
       const { auth, onAuthStateChanged } = await import("./firebase.js");
       onAuthStateChanged(auth, (user) => {
-        if (user) {
-          console.log("✅ Mindmap: User is signed in:", user.email);
+        if (user && !user.isAnonymous) {
+          console.log("✅ Mindmap: User signed in:", user.email, user.uid);
           setIsAuthenticated(true);
-          loadMindmapsFromFirestore();
+          loadMindmapsFromFirestore(); // Load user-specific data
         } else {
-          console.log("👤 Mindmap: No user signed in");
+          console.log("👤 Mindmap: No user signed in or anonymous");
           setIsAuthenticated(false);
-          loadMindmapsFromFirestore();
+          // Clear data if user signs out
+          if (user === null) {
+            setMaps([]);
+            setActiveMap(null);
+          }
         }
       });
     };
