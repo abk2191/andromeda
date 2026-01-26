@@ -213,6 +213,10 @@ function App() {
                 </div>
               </div> */}
               <div className="sliding-div-container item-style">
+                <span className="user-info">
+                  <i class="fa-solid fa-user"></i> &nbsp;{user.email}
+                  <div className="placeholder-div"></div>
+                </span>
                 <div
                   className="sliding-div div-style"
                   onClick={() => {
@@ -311,7 +315,7 @@ function App() {
                 </div>
 
                 <div className="name-brand">
-                  <h2 style={{ color: "white", fontSize: "20px" }}>
+                  <h2 style={{ color: "white" }}>
                     <i className="fa-solid fa-flask"></i> iINTUIT Labs.
                   </h2>
                 </div>
