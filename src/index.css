@@ -2490,9 +2490,9 @@ body {
 
 /* PWA-specific adjustments when app is installed as standalone */
 @media (display-mode: fullscreen) {
-  .theme-holder {
+  /* .theme-holder {
     margin-top: 70px;
-  }
+  } */
 
   .theme-holder-main {
     gap: 20px;
