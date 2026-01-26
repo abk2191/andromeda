@@ -422,6 +422,7 @@ html.dark-theme {
 
 .dark-theme .div-style {
   background: #1a1a1a !important;
+  border: 1px solid #1a1a1a;
 }
 
 .dark-theme .user-info {
