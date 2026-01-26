@@ -111,6 +111,14 @@ html.dark-theme {
   background-color: #32327a;
 }
 
+.dark-theme .hamburger.open:hover {
+  background-color: black;
+}
+
+.dark-theme .hamburger:hover {
+  background-color: black;
+}
+
 /* ===== GOOGLE-STYLE SIDEBAR ===== */
 .sidebar {
   display: flex;
