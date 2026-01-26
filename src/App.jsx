@@ -226,7 +226,7 @@ function App() {
                 >
                   <div className="sidebar-menu-items">
                     <i className="fa-solid fa-lightbulb"></i>
-                    <h2 style={{ fontSize: "25px" }}>NOTES</h2>
+                    <h2 style={{ fontSize: "18px" }}>NOTES</h2>
                   </div>
                 </div>
 
@@ -239,7 +239,7 @@ function App() {
                 >
                   <div className="sidebar-menu-items">
                     <i className="fa-solid fa-list-check"></i>
-                    <h2 style={{ fontSize: "25px" }}>TODOS</h2>
+                    <h2 style={{ fontSize: "18px" }}>TODOS</h2>
                   </div>
                 </div>
 
@@ -252,7 +252,7 @@ function App() {
                 >
                   <div className="sidebar-menu-items">
                     <i className="fa-solid fa-calendar-days"></i>
-                    <h2 style={{ fontSize: "25px" }}>CALENDAR</h2>
+                    <h2 style={{ fontSize: "18px" }}>CALENDAR</h2>
                   </div>
                 </div>
 
@@ -265,7 +265,7 @@ function App() {
                 >
                   <div className="sidebar-menu-items">
                     <i className="fa-solid fa-brain"></i>
-                    <h2 style={{ fontSize: "25px" }}>MINDMAP</h2>
+                    <h2 style={{ fontSize: "18px" }}>MINDMAP</h2>
                   </div>
                 </div>
 
