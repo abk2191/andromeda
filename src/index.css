@@ -407,6 +407,38 @@ html.dark-theme {
   color: white;
 }
 
+.dark-theme .navbar,
+.dark-theme .sidebar {
+  background: #1a1a1a !important;
+}
+
+.dark-theme .div-style {
+  background: #1a1a1a !important;
+}
+
+.dark-theme .user-info {
+  border-bottom: 1px solid rgb(61, 61, 61);
+}
+
+.dark-theme .sign-out {
+  background-color: black;
+}
+
+.dark-theme .toggle-border label {
+  background-color: black;
+}
+
+body.dark-theme,
+html.dark-theme {
+  background-color: #000000 !important; /* Black */
+}
+
+.dark-theme .search-input {
+  background: #1a1a1a !important;
+  border: 3px solid #333333 !important;
+  color: white !important;
+}
+
 .year-month-container {
 }
 
@@ -1315,11 +1347,11 @@ html {
 }
 
 /* Dark theme styles for search-input */
-.dark-theme .search-input {
+/* .dark-theme .search-input {
   border: 3px solid #000033 !important;
   color: white !important;
   background: #32327a !important;
-}
+} */
 
 .dark-theme .search-input::placeholder {
   color: white !important;
