@@ -2490,7 +2490,7 @@ body {
 
 /* PWA-specific adjustments when app is installed as standalone */
 @media (display-mode: fullscreen) {
-  .name-brand {
+  .theme-holder {
     margin-top: 120px;
   }
 
