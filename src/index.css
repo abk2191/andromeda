@@ -170,12 +170,24 @@ html.dark-theme {
 }
 
 .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   color: white;
   font-size: 13px;
   font-family: "Inter", sans-serif;
   text-align: center;
   border-bottom: 1px solid #32327a;
   padding: 5px;
+}
+
+.flex-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .placeholder-div {

@@ -220,7 +220,13 @@ function App() {
               </div> */}
               <div className="sliding-div-container item-style">
                 <span className="user-info">
-                  <i class="fa-solid fa-user"></i> &nbsp;{user.email}
+                  <div className="flex-div">
+                    <i
+                      class="fa-solid fa-circle"
+                      style={{ color: "#31A24C" }}
+                    ></i>
+                    <i class="fa-solid fa-user"></i> &nbsp;{user.email}{" "}
+                  </div>
                   <div className="placeholder-div"></div>
                 </span>
                 <div
