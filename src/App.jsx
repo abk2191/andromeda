@@ -223,7 +223,7 @@ function App() {
                   <div className="flex-div">
                     <i
                       class="fa-solid fa-circle"
-                      style={{ color: "#31A24C" }}
+                      style={{ color: "teal", fontSize: "10px" }}
                     ></i>
                     <i class="fa-solid fa-user"></i> &nbsp;{user.email}{" "}
                   </div>
