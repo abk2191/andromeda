@@ -2286,6 +2286,26 @@ html {
   background-color: rgb(56, 56, 21);
 }
 
+.color-yellow-div:active {
+  transform: scale(0.85); /* 95% of original size */
+  transition: transform 0.1s ease; /* Optional: smooth animation */
+}
+
+.color-maroon-div:active {
+  transform: scale(0.85); /* 95% of original size */
+  transition: transform 0.1s ease; /* Optional: smooth animation */
+}
+
+.color-blue-div:active {
+  transform: scale(0.85); /* 95% of original size */
+  transition: transform 0.1s ease; /* Optional: smooth animation */
+}
+
+.color-green-div:active {
+  transform: scale(0.85); /* 95% of original size */
+  transition: transform 0.1s ease; /* Optional: smooth animation */
+}
+
 .color-maroon-div {
   height: 30px;
   width: 30px;

@@ -1847,21 +1847,47 @@ function Calendar() {
     // Find the event to get its date for cleanup
     const eventToRemove = event.find((e) => e.id === eventToDelete);
 
-    // Filter out only the specific event by ID
-    setEvent((prevEvents) =>
-      prevEvents.filter((event) => event.id !== eventToDelete),
-    );
+    // Create the new events array without the deleted event
+    const updatedEvents = event.filter((event) => event.id !== eventToDelete);
+
+    // Immediately update state
+    setEvent(updatedEvents);
+
+    // NEW: Immediately save to Firestore
+    const saveToFirestore = async () => {
+      try {
+        await saveCalendarData(updatedEvents);
+        console.log("✅ Event deleted and Firestore updated");
+      } catch (error) {
+        console.error("❌ Failed to save deleted event to Firestore:", error);
+        // Keep the state change but log the error
+      }
+    };
+    saveToFirestore();
 
     // NEW: Clear colors for all dates that were part of this event
     if (eventToRemove && eventToRemove.dateKeys) {
-      setDateColors((prevColors) => {
-        const newColors = { ...prevColors };
-        // Remove color entries for all date keys of this event
-        eventToRemove.dateKeys.forEach((dateKey) => {
-          delete newColors[dateKey];
-        });
-        return newColors;
+      const newColors = { ...dateColors };
+      // Remove color entries for all date keys of this event
+      eventToRemove.dateKeys.forEach((dateKey) => {
+        delete newColors[dateKey];
       });
+
+      // Update state
+      setDateColors(newColors);
+
+      // Also save colors to Firestore
+      const saveColorsToFirestore = async () => {
+        try {
+          await saveCalendarDateColors(newColors);
+        } catch (error) {
+          console.error(
+            "❌ Failed to save updated colors to Firestore:",
+            error,
+          );
+        }
+      };
+      saveColorsToFirestore();
     }
 
     // Close the warning modal and clear the event ID
@@ -1871,9 +1897,8 @@ function Calendar() {
     // Check if there are still events for this selected date
     if (eventToRemove && selectedDate) {
       const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
-      const remainingEvents = event.filter(
-        (e) =>
-          e.id !== eventToDelete && e.dateKeys && e.dateKeys.includes(dateKey),
+      const remainingEvents = updatedEvents.filter(
+        (e) => e.dateKeys && e.dateKeys.includes(dateKey),
       );
 
       // If no events remain for this date, close the event viewer
