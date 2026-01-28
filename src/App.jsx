@@ -221,7 +221,7 @@ function App() {
               <div className="sliding-div-container item-style">
                 <span className="user-info">
                   <div className="flex-div">
-                    <i class="fa-solid fa-user"></i>Signed in as -&nbsp;
+                    <i class="fa-solid fa-user"></i>
                     {user.email}{" "}
                   </div>
                 </span>
