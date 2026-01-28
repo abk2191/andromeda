@@ -50,6 +50,9 @@ html.dark-theme {
   background: #000033;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0 24px;
+  transition:
+    background-color 0.5s ease,
+    background 0.5s ease;
 }
 
 /* ===== GOOGLE-STYLE HAMBURGER MENU ===== */
@@ -89,8 +92,22 @@ html.dark-theme {
 
 /* Hover Effects */
 .hamburger:hover {
-  background-color: #32327a;
+  /* background-color: #32327a; */
   transform: scale(1.05);
+}
+
+.hamburger.has-accent-hover:hover {
+  background-color: var(--accent-hover-color, #32327a) !important;
+}
+
+/* Set the custom property via JavaScript - we'll use inline styles */
+.hamburger[style*="--accent-hover-color"]:hover {
+  background-color: var(--accent-hover-color) !important;
+}
+
+/* For the hamburger when open */
+.hamburger.has-accent-hover.open:hover {
+  background-color: var(--accent-hover-color, #32327a) !important;
 }
 
 /* X Transformation when open */
@@ -108,7 +125,7 @@ html.dark-theme {
 }
 
 .hamburger.open:hover {
-  background-color: #32327a;
+  /* background-color: #32327a; */
 }
 
 .dark-theme .hamburger.open:hover {
@@ -130,7 +147,6 @@ html.dark-theme {
   left: 0;
   width: 280px;
   height: 100vh;
-  background: #000033;
   color: #202124;
   z-index: 9998;
   transform: translateX(-100%);
@@ -143,7 +159,12 @@ html.dark-theme {
     0 8px 10px 1px rgba(0, 0, 0, 0.14),
     0 3px 14px 2px rgba(0, 0, 0, 0.12),
     0 5px 5px -3px rgba(0, 0, 0, 0.2);
-  border-top: 1px solid #32327a;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.5s ease,
+    background 0.5s ease,
+    border-top-color 0.5s ease;
 }
 
 .dark-theme .sidebar {
@@ -182,9 +203,10 @@ html.dark-theme {
   font-size: 10.5px;
   font-family: "Roboto", "Segoe UI", "Inter", sans-serif;
   text-align: center;
-  border-bottom: 1px solid #32327a;
+  /* border-bottom: 1px solid #32327a; */
   padding: 5px;
   height: 40px;
+  transition: border-bottom-color 0.5s ease;
 }
 
 .flex-div {
@@ -192,6 +214,44 @@ html.dark-theme {
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+/* Google Calendar event styling */
+.google-calendar-event {
+  border-left: 3px solid #1a73e8 !important;
+}
+
+.google-calendar-badge {
+  background-color: #1a73e8;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* Different color indicators for Google events */
+.date-item.google-event {
+  background-color: rgba(26, 115, 232, 0.2) !important;
+  border: 1px solid #1a73e8 !important;
+}
+
+/* Sync button animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.syncing {
+  animation: pulse 1.5s infinite;
 }
 
 /* .placeholder-div {
@@ -218,7 +278,6 @@ html.dark-theme {
   background-color: transparent;
   cursor: pointer;
   transition: background-color 0.2s;
-  border: 1px solid #000033;
   border-radius: 10px;
   margin-left: 10px;
 }
@@ -1858,7 +1917,7 @@ html {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  margin-top: -350px;
+  margin-top: -450px;
 }
 
 .name-brand {
@@ -2198,6 +2257,7 @@ html {
   align-items: center;
   justify-content: left;
   padding: 20px;
+  transition: background-color 0.5s ease;
 }
 
 .sign-out-btn {
@@ -2211,12 +2271,55 @@ html {
   color: white;
 }
 
+.theme-switcher-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.color-yellow-div {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background-color: rgb(56, 56, 21);
+}
+
+.color-maroon-div {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background-color: rgb(99, 37, 37);
+}
+
+.color-blue-div {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background-color: #000033;
+}
+
+.color-green-div {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background-color: rgb(15, 56, 15);
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,
   .event-loc,
   .event-time {
     font-size: 22px !important;
+  }
+
+  .theme-holder {
+    margin-top: -320px;
   }
 
   .event-editor {
