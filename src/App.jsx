@@ -221,13 +221,9 @@ function App() {
               <div className="sliding-div-container item-style">
                 <span className="user-info">
                   <div className="flex-div">
-                    <i
-                      class="fa-solid fa-circle"
-                      style={{ color: "teal", fontSize: "10px" }}
-                    ></i>
-                    <i class="fa-solid fa-user"></i> &nbsp;{user.email}{" "}
+                    <i class="fa-solid fa-user"></i>Signed in as -&nbsp;
+                    {user.email}{" "}
                   </div>
-                  <div className="placeholder-div"></div>
                 </span>
                 <div
                   className="sliding-div div-style"
