@@ -44,13 +44,13 @@ function App() {
 
     // Set accent color based on selected theme color (only in light mode)
     if (isLightTheme) {
-      if (color === "rgb(56, 56, 21)") {
+      if (color === "rgb(43, 25, 7)") {
         accentColor = "rgb(83, 83, 32)"; // Lighter yellow
-      } else if (color === "rgb(99, 37, 37)") {
+      } else if (color === "rgb(45, 17, 17)") {
         accentColor = "rgb(130, 49, 49)"; // Lighter maroon
       } else if (color === "#000033") {
         accentColor = "#000066"; // Lighter navy blue
-      } else if (color === "rgb(15, 56, 15)") {
+      } else if (color === "rgb(8, 30, 8)") {
         accentColor = "rgb(20, 75, 20)"; // Lighter green
       }
     }
@@ -390,11 +390,11 @@ function App() {
                 <div className="theme-switcher-div">
                   <div
                     className="color-yellow-div"
-                    onClick={() => handleThemeChange("rgb(56, 56, 21)")}
+                    onClick={() => handleThemeChange("rgb(43, 25, 7)")}
                   ></div>
                   <div
                     className="color-maroon-div"
-                    onClick={() => handleThemeChange("rgb(99, 37, 37)")}
+                    onClick={() => handleThemeChange("rgb(45, 17, 17)")}
                   ></div>
                   <div
                     className="color-blue-div"
@@ -402,7 +402,7 @@ function App() {
                   ></div>
                   <div
                     className="color-green-div"
-                    onClick={() => handleThemeChange("rgb(15, 56, 15)")}
+                    onClick={() => handleThemeChange("rgb(8, 30, 8)")}
                   ></div>
                 </div>
 
