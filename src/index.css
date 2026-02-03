@@ -836,10 +836,10 @@ html.dark-theme {
   background: #000033;
   padding: 0;
   border: none;
-  box-shadow:
+  /* box-shadow:
     0 16px 24px 2px rgba(0, 0, 0, 0.14),
     0 6px 30px 5px rgba(0, 0, 0, 0.12),
-    0 8px 10px -5px rgba(0, 0, 0, 0.2);
+    0 8px 10px -5px rgba(0, 0, 0, 0.2); */
   z-index: 22000;
   width: 90%;
   max-width: 700px;
@@ -2404,7 +2404,7 @@ html {
   .notes-modal {
     height: 500px;
     overflow-y: auto;
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+    /* box-shadow: 0 0 6px rgba(255, 255, 255, 0.4); */
   }
 
   .page-text-2 h2 {
