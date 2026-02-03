@@ -930,42 +930,43 @@ function Notes() {
                     ? pinnedNotes[selectedNoteIndex]?.date || "No date"
                     : notes[selectedNoteIndex]?.date || "No date"}
                 </p>
+
                 <p>
                   {isNotePinned
                     ? pinnedNotes[selectedNoteIndex]?.time || "No time"
                     : notes[selectedNoteIndex]?.time || "No time"}
                 </p>
-                {/* ADDED: Edited timestamp */}
-
-                {isNotePinned && pinnedNotes[selectedNoteIndex]?.editedAt && (
-                  <p
-                    style={{
-                      color: "white",
-                      fontSize: "9px",
-                      fontFamily: "Inter, sans-serif",
-                      marginTop: "4px",
-                      opacity: 0.9,
-                    }}
-                  >
-                    <i class="fa-solid fa-pen"></i>{" "}
-                    {pinnedNotes[selectedNoteIndex].editedAt}
-                  </p>
-                )}
-
-                {!isNotePinned && notes[selectedNoteIndex]?.editedAt && (
-                  <p
-                    style={{
-                      color: "white",
-                      fontSize: "9px",
-                      fontFamily: "Inter, sans-serif",
-                      marginTop: "4px",
-                      opacity: 0.9,
-                    }}
-                  >
-                    <i class="fa-solid fa-pen"></i>{" "}
-                    {notes[selectedNoteIndex].editedAt}
-                  </p>
-                )}
+                <div className="flx-clm">
+                  {/* ADDED: Edited timestamp */}
+                  {isNotePinned && pinnedNotes[selectedNoteIndex]?.editedAt && (
+                    <p
+                      style={{
+                        color: "white",
+                        fontSize: "9px",
+                        fontFamily: "Inter, sans-serif",
+                        marginTop: "4px",
+                        opacity: 0.9,
+                      }}
+                    >
+                      Edited on - {pinnedNotes[selectedNoteIndex].editedAt}
+                    </p>
+                  )}
+                </div>
+                <div className="flx-clm">
+                  {!isNotePinned && notes[selectedNoteIndex]?.editedAt && (
+                    <p
+                      style={{
+                        color: "white",
+                        fontSize: "9px",
+                        fontFamily: "Inter, sans-serif",
+                        marginTop: "4px",
+                        opacity: 0.9,
+                      }}
+                    >
+                      Edited on - {notes[selectedNoteIndex].editedAt}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="cls-btn-div">
                 <button className="cls-nt-btn" onClick={closeNote}>

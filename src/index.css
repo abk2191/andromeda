@@ -937,6 +937,10 @@ html.dark-theme {
   color: white;
 }
 
+.flx-clm {
+  padding-left: 4.5px;
+}
+
 .mdl-hdr {
   display: flex;
   align-items: center;

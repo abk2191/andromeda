@@ -1302,21 +1302,23 @@ function Todo() {
               <div className="nt-dt-tm">
                 <p style={{ fontWeight: "bold" }}>{currentTodo.date}</p>
                 <p>{currentTodo.time}</p>
-                {/* ADDED: Edited timestamp */}
-                {currentTodo.editedAt && (
-                  <p
-                    style={{
-                      color: "white",
-                      fontSize: "9px",
-                      fontFamily: "Inter, sans-serif",
-                      marginTop: "4px",
+                <div className="flx-clm">
+                  {/* ADDED: Edited timestamp */}
+                  {currentTodo.editedAt && (
+                    <p
+                      style={{
+                        color: "white",
+                        fontSize: "9px",
+                        fontFamily: "Inter, sans-serif",
+                        marginTop: "4px",
 
-                      opacity: 0.9,
-                    }}
-                  >
-                    <i class="fa-solid fa-pen"></i> {currentTodo.editedAt}
-                  </p>
-                )}
+                        opacity: 0.9,
+                      }}
+                    >
+                      Edited on - {currentTodo.editedAt}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="cls-btn-div">
                 <button className="cls-nt-btn" onClick={closeTodo}>
