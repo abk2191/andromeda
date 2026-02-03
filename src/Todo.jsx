@@ -1307,14 +1307,14 @@ function Todo() {
                   <p
                     style={{
                       color: "white",
-                      fontSize: "12px",
+                      fontSize: "9px",
                       fontFamily: "Inter, sans-serif",
                       marginTop: "4px",
-                      marginLeft: "2px",
+
                       opacity: 0.9,
                     }}
                   >
-                    Edited on: {currentTodo.editedAt}
+                    <i class="fa-solid fa-pen"></i> {currentTodo.editedAt}
                   </p>
                 )}
               </div>

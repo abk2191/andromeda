@@ -936,32 +936,34 @@ function Notes() {
                     : notes[selectedNoteIndex]?.time || "No time"}
                 </p>
                 {/* ADDED: Edited timestamp */}
+
                 {isNotePinned && pinnedNotes[selectedNoteIndex]?.editedAt && (
                   <p
                     style={{
                       color: "white",
-                      fontSize: "12px",
+                      fontSize: "9px",
                       fontFamily: "Inter, sans-serif",
                       marginTop: "4px",
-                      marginLeft: "6px",
                       opacity: 0.9,
                     }}
                   >
-                    Edited on: {pinnedNotes[selectedNoteIndex].editedAt}
+                    <i class="fa-solid fa-pen"></i>{" "}
+                    {pinnedNotes[selectedNoteIndex].editedAt}
                   </p>
                 )}
+
                 {!isNotePinned && notes[selectedNoteIndex]?.editedAt && (
                   <p
                     style={{
                       color: "white",
-                      fontSize: "12px",
+                      fontSize: "9px",
                       fontFamily: "Inter, sans-serif",
                       marginTop: "4px",
-                      marginLeft: "2px",
                       opacity: 0.9,
                     }}
                   >
-                    Edited on: {notes[selectedNoteIndex].editedAt}
+                    <i class="fa-solid fa-pen"></i>{" "}
+                    {notes[selectedNoteIndex].editedAt}
                   </p>
                 )}
               </div>
