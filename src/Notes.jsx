@@ -153,6 +153,46 @@ function Notes() {
   //*******************************************************************************/
   //*******************************************************************************/
 
+  // Function to format month number to abbreviated month name
+  const formatMonth = (monthNumber) => {
+    const monthNames = {
+      1: "Jan",
+      2: "Feb",
+      3: "Mar",
+      4: "Apr",
+      5: "May",
+      6: "Jun",
+      7: "Jul",
+      8: "Aug",
+      9: "Sep",
+      10: "Oct",
+      11: "Nov",
+      12: "Dec",
+    };
+    return monthNames[monthNumber] || monthNumber;
+  };
+
+  // Function to parse and reformat date string
+  const reformatDateString = (dateString) => {
+    if (!dateString) return dateString;
+
+    // Check if dateString is already in the new format (contains month name)
+    if (dateString.match(/[A-Za-z]{3}\/\d+\/\d{4}/)) {
+      return dateString;
+    }
+
+    // Parse date string like "2/3/2026"
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const month = parseInt(parts[0]);
+      const day = parts[1];
+      const year = parts[2];
+      return `${formatMonth(month)}/${day}/${year}`;
+    }
+
+    return dateString;
+  };
+
   // Load all data from Firestore on component mount
   useEffect(() => {
     const loadAllData = async () => {
@@ -275,8 +315,9 @@ function Notes() {
     // Format time with leading zero
     const formattedHours = hours.toString().padStart(2, "0");
 
-    // Create the formatted strings
-    const dateString = `${month}/${day}/${year}`;
+    // Create the formatted strings with abbreviated month name
+    const monthAbbrev = formatMonth(month);
+    const dateString = `${monthAbbrev}/${day}/${year}`;
     const timeString = `${formattedHours}:${minutes} ${ampm}`;
 
     const newNoteItem = {
@@ -928,8 +969,11 @@ function Notes() {
                 <div className="flx-dv">
                   <p>
                     {isNotePinned
-                      ? pinnedNotes[selectedNoteIndex]?.date || "No date"
-                      : notes[selectedNoteIndex]?.date || "No date"}
+                      ? reformatDateString(
+                          pinnedNotes[selectedNoteIndex]?.date,
+                        ) || "No date"
+                      : reformatDateString(notes[selectedNoteIndex]?.date) ||
+                        "No date"}
                   </p>
 
                   <p>
@@ -950,7 +994,14 @@ function Notes() {
                         opacity: 0.9,
                       }}
                     >
-                      Edited on - {pinnedNotes[selectedNoteIndex].editedAt}
+                      Edited on -{" "}
+                      {reformatDateString(
+                        pinnedNotes[selectedNoteIndex].editedAt.split(
+                          " at ",
+                        )[0],
+                      )}{" "}
+                      at{" "}
+                      {pinnedNotes[selectedNoteIndex].editedAt.split(" at ")[1]}
                     </p>
                   )}
                 </div>
@@ -965,7 +1016,11 @@ function Notes() {
                         opacity: 0.9,
                       }}
                     >
-                      Edited on - {notes[selectedNoteIndex].editedAt}
+                      Edited on -{" "}
+                      {reformatDateString(
+                        notes[selectedNoteIndex].editedAt.split(" at ")[0],
+                      )}{" "}
+                      at {notes[selectedNoteIndex].editedAt.split(" at ")[1]}
                     </p>
                   )}
                 </div>
@@ -997,7 +1052,8 @@ function Notes() {
                   hours = hours % 12;
                   hours = hours ? hours : 12;
                   const formattedHours = hours.toString().padStart(2, "0");
-                  const editedAtString = `${month}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
+                  const monthAbbrev = formatMonth(month);
+                  const editedAtString = `${monthAbbrev}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
 
                   if (isNotePinned) {
                     // Update pinned note
