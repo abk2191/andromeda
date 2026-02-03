@@ -2485,7 +2485,7 @@ html {
   .notes-modal {
     width: 95%;
     max-height: 90vh;
-    border-radius: 8px;
+
     border: 2px solid white;
   }
 
