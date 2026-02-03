@@ -284,6 +284,7 @@ function Notes() {
       content: `Add text`,
       date: dateString,
       time: timeString,
+      editedAt: null, // Initialize editedAt as null for new notes
     };
 
     setNotes((prevNotes) => [...prevNotes, newNoteItem]);
@@ -934,6 +935,33 @@ function Notes() {
                     ? pinnedNotes[selectedNoteIndex]?.time || "No time"
                     : notes[selectedNoteIndex]?.time || "No time"}
                 </p>
+                {/* ADDED: Edited timestamp */}
+                {isNotePinned && pinnedNotes[selectedNoteIndex]?.editedAt && (
+                  <p
+                    style={{
+                      color: "white",
+                      fontSize: "12px",
+                      fontFamily: "Inter, sans-serif",
+                      marginTop: "4px",
+                      opacity: 0.9,
+                    }}
+                  >
+                    Edited on: {pinnedNotes[selectedNoteIndex].editedAt}
+                  </p>
+                )}
+                {!isNotePinned && notes[selectedNoteIndex]?.editedAt && (
+                  <p
+                    style={{
+                      color: "white",
+                      fontSize: "12px",
+                      fontFamily: "Inter, sans-serif",
+                      marginTop: "4px",
+                      opacity: 0.9,
+                    }}
+                  >
+                    Edited on: {notes[selectedNoteIndex].editedAt}
+                  </p>
+                )}
               </div>
               <div className="cls-btn-div">
                 <button className="cls-nt-btn" onClick={closeNote}>
@@ -950,11 +978,28 @@ function Notes() {
                 onInput={(e) => {
                   const updatedText = e.target.innerHTML;
 
+                  // Get current date and time for edited timestamp
+                  const now = new Date();
+                  const month = now.getMonth() + 1;
+                  const day = now.getDate();
+                  const year = now.getFullYear();
+                  let hours = now.getHours();
+                  const minutes = now.getMinutes().toString().padStart(2, "0");
+                  const ampm = hours >= 12 ? "PM" : "AM";
+                  hours = hours % 12;
+                  hours = hours ? hours : 12;
+                  const formattedHours = hours.toString().padStart(2, "0");
+                  const editedAtString = `${month}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
+
                   if (isNotePinned) {
                     // Update pinned note
                     const updatedPinnedNotes = pinnedNotes.map((n, i) =>
                       i === selectedNoteIndex
-                        ? { ...n, content: updatedText }
+                        ? {
+                            ...n,
+                            content: updatedText,
+                            editedAt: editedAtString,
+                          }
                         : n,
                     );
                     setPinnedNotes(updatedPinnedNotes);
@@ -967,7 +1012,11 @@ function Notes() {
                     // Update regular note
                     const updatedNotes = notes.map((n, i) =>
                       i === selectedNoteIndex
-                        ? { ...n, content: updatedText }
+                        ? {
+                            ...n,
+                            content: updatedText,
+                            editedAt: editedAtString,
+                          }
                         : n,
                     );
                     setNotes(updatedNotes);

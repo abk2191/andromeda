@@ -321,6 +321,7 @@ function Todo() {
       title: "Todo List",
       date: dateString,
       time: timeString,
+      editedAt: null, // Initialize editedAt as null for new todos
     };
 
     setTodos((prevTodos) => [...prevTodos, newTodoItem]);
@@ -554,9 +555,24 @@ function Todo() {
   async function updateTodoTitle() {
     if (!editingTitle.trim()) return;
 
+    // Get current date and time for edited timestamp
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedHours = hours.toString().padStart(2, "0");
+    const editedAtString = `${month}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
+
     if (isTodoPinned && selectedTodoIndex !== null) {
       const updatedPinnedTodos = pinnedTodos.map((t, i) =>
-        i === selectedTodoIndex ? { ...t, title: editingTitle } : t,
+        i === selectedTodoIndex
+          ? { ...t, title: editingTitle, editedAt: editedAtString }
+          : t,
       );
       setPinnedTodos(updatedPinnedTodos);
 
@@ -568,7 +584,9 @@ function Todo() {
       }
     } else if (selectedTodoIndex !== null) {
       const updatedTodos = todos.map((t, i) =>
-        i === selectedTodoIndex ? { ...t, title: editingTitle } : t,
+        i === selectedTodoIndex
+          ? { ...t, title: editingTitle, editedAt: editedAtString }
+          : t,
       );
       setTodos(updatedTodos);
 
@@ -672,6 +690,19 @@ function Todo() {
   }
 
   async function updateTaskText(todoId, taskId, newText) {
+    // Get current date and time for edited timestamp
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedHours = hours.toString().padStart(2, "0");
+    const editedAtString = `${month}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
+
     const newTasks = {
       ...tasks,
       [todoId]: (tasks[todoId] || []).map((task) =>
@@ -681,7 +712,22 @@ function Todo() {
 
     setTasks(newTasks);
 
-    // Save to Firebase
+    // Also update the todo's editedAt timestamp when tasks are modified
+    if (isTodoPinned) {
+      const updatedPinnedTodos = pinnedTodos.map((t) =>
+        t.id === todoId ? { ...t, editedAt: editedAtString } : t,
+      );
+      setPinnedTodos(updatedPinnedTodos);
+      await saveAllData("pinnedTodos", updatedPinnedTodos);
+    } else {
+      const updatedTodos = todos.map((t) =>
+        t.id === todoId ? { ...t, editedAt: editedAtString } : t,
+      );
+      setTodos(updatedTodos);
+      await saveAllData("todos", updatedTodos);
+    }
+
+    // Save tasks to Firebase
     try {
       await saveAllData("todoTasks", newTasks);
     } catch (error) {
@@ -1256,6 +1302,20 @@ function Todo() {
               <div className="nt-dt-tm">
                 <p style={{ fontWeight: "bold" }}>{currentTodo.date}</p>
                 <p>{currentTodo.time}</p>
+                {/* ADDED: Edited timestamp */}
+                {currentTodo.editedAt && (
+                  <p
+                    style={{
+                      color: "white",
+                      fontSize: "12px",
+                      fontFamily: "Inter, sans-serif",
+                      marginTop: "4px",
+                      opacity: 0.9,
+                    }}
+                  >
+                    Edited on: {currentTodo.editedAt}
+                  </p>
+                )}
               </div>
               <div className="cls-btn-div">
                 <button className="cls-nt-btn" onClick={closeTodo}>
