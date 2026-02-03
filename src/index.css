@@ -2486,6 +2486,7 @@ html {
     width: 95%;
     max-height: 90vh;
     border: 2px solid white;
+    border-radius: 8px;
   }
 
   .hamburger {
