@@ -925,17 +925,19 @@ function Notes() {
           >
             <div className="mdl-hdr">
               <div className="nt-dt-tm">
-                <p style={{ fontWeight: "bold" }}>
-                  {isNotePinned
-                    ? pinnedNotes[selectedNoteIndex]?.date || "No date"
-                    : notes[selectedNoteIndex]?.date || "No date"}
-                </p>
+                <div className="flx-dv">
+                  <p style={{ fontWeight: "bold" }}>
+                    {isNotePinned
+                      ? pinnedNotes[selectedNoteIndex]?.date || "No date"
+                      : notes[selectedNoteIndex]?.date || "No date"}
+                  </p>
 
-                <p>
-                  {isNotePinned
-                    ? pinnedNotes[selectedNoteIndex]?.time || "No time"
-                    : notes[selectedNoteIndex]?.time || "No time"}
-                </p>
+                  <p>
+                    {isNotePinned
+                      ? pinnedNotes[selectedNoteIndex]?.time || "No time"
+                      : notes[selectedNoteIndex]?.time || "No time"}
+                  </p>
+                </div>
                 <div className="flx-clm">
                   {/* ADDED: Edited timestamp */}
                   {isNotePinned && pinnedNotes[selectedNoteIndex]?.editedAt && (
@@ -974,6 +976,7 @@ function Notes() {
                 </button>
               </div>
             </div>
+
             <div className="modal-content">
               <div
                 className="note-content"

@@ -871,6 +871,7 @@ html.dark-theme {
   align-items: center;
   justify-content: flex-end;
   padding: 16px 16px 8px;
+  margin-top: 8px;
 }
 
 .cls-nt-btn {
@@ -932,9 +933,15 @@ html.dark-theme {
   margin-top: 35px;
   margin-left: 25px;
   font-size: 30px;
-
   font-family: "Inter", sans-serif;
   color: white;
+}
+
+.flx-dv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
 }
 
 .flx-clm {

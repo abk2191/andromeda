@@ -1300,8 +1300,10 @@ function Todo() {
           >
             <div className="mdl-hdr">
               <div className="nt-dt-tm">
-                <p style={{ fontWeight: "bold" }}>{currentTodo.date}</p>
-                <p>{currentTodo.time}</p>
+                <div className="flx-dv">
+                  <p style={{ fontWeight: "bold" }}>{currentTodo.date}</p>
+                  <p>{currentTodo.time}</p>
+                </div>
                 <div className="flx-clm">
                   {/* ADDED: Edited timestamp */}
                   {currentTodo.editedAt && (
