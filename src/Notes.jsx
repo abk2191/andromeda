@@ -926,7 +926,7 @@ function Notes() {
             <div className="mdl-hdr">
               <div className="nt-dt-tm">
                 <div className="flx-dv">
-                  <p style={{ fontWeight: "bold" }}>
+                  <p>
                     {isNotePinned
                       ? pinnedNotes[selectedNoteIndex]?.date || "No date"
                       : notes[selectedNoteIndex]?.date || "No date"}

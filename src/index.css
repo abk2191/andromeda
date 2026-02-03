@@ -932,9 +932,13 @@ html.dark-theme {
   flex-direction: column;
   margin-top: 35px;
   margin-left: 25px;
-  font-size: 30px;
+  font-size: 25px;
   font-family: "Inter", sans-serif;
   color: white;
+}
+
+.modal-time-text {
+  font-size: 35px !important;
 }
 
 .flx-dv {
@@ -944,9 +948,9 @@ html.dark-theme {
   gap: 15px;
 }
 
-.flx-clm {
+/* .flx-clm {
   padding-left: 4.5px;
-}
+} */
 
 .mdl-hdr {
   display: flex;
