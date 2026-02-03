@@ -943,6 +943,7 @@ function Notes() {
                       fontSize: "12px",
                       fontFamily: "Inter, sans-serif",
                       marginTop: "4px",
+                      marginLeft: "6px",
                       opacity: 0.9,
                     }}
                   >
@@ -956,6 +957,7 @@ function Notes() {
                       fontSize: "12px",
                       fontFamily: "Inter, sans-serif",
                       marginTop: "4px",
+                      marginLeft: "2px",
                       opacity: 0.9,
                     }}
                   >
