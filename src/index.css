@@ -845,10 +845,11 @@ html.dark-theme {
   max-width: 700px;
   max-height: 600px;
   overflow-y: auto;
-  animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1); */
+  animation: modalFloatIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-@keyframes modalAppear {
+/* @keyframes modalAppear {
   from {
     opacity: 0;
     transform: translate(-50%, -48%);
@@ -857,7 +858,62 @@ html.dark-theme {
     opacity: 1;
     transform: translate(-50%, -50%);
   }
+} */
+
+/* @keyframes modalEmerge {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    filter: blur(10px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.02);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0);
+  }
+} */
+
+@keyframes modalFloatIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7) translateY(20px);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.01) translateY(-2px);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(0.99) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) translateY(0);
+  }
 }
+
+/* .notes-modal.modal-closing {
+  animation: modalFloatOut 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+@keyframes modalFloatOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    filter: blur(10px);
+  }
+} */
 
 .modal-content {
   display: flex;
