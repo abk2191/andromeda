@@ -50,8 +50,8 @@ function App() {
         accentColor = "rgb(177, 199, 62)"; // Lighter maroon
       } else if (color === "#000033") {
         accentColor = "#0e0e5f"; // Lighter navy blue
-      } else if (color === "rgb(8, 30, 8)") {
-        accentColor = "rgb(20, 75, 20)"; // Lighter green
+      } else if (color === "rgb(38, 134, 38)") {
+        accentColor = "rgb(26, 90, 26)"; // Lighter green
       }
     }
 
@@ -402,7 +402,7 @@ function App() {
                   ></div>
                   <div
                     className="color-green-div"
-                    onClick={() => handleThemeChange("rgb(8, 30, 8)")}
+                    onClick={() => handleThemeChange("rgb(38, 134, 38)")}
                   ></div>
                 </div>
 
