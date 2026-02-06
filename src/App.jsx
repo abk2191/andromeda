@@ -46,8 +46,8 @@ function App() {
     if (isLightTheme) {
       if (color === "rgb(30, 6, 27)") {
         accentColor = "rgb(63, 13, 56)"; // Lighter yellow
-      } else if (color === "rgb(45, 17, 17)") {
-        accentColor = "rgb(74, 29, 29)"; // Lighter maroon
+      } else if (color === "rgb(185, 210, 61)") {
+        accentColor = "rgb(177, 199, 62)"; // Lighter maroon
       } else if (color === "#000033") {
         accentColor = "#0e0e5f"; // Lighter navy blue
       } else if (color === "rgb(8, 30, 8)") {
@@ -394,7 +394,7 @@ function App() {
                   ></div>
                   <div
                     className="color-maroon-div"
-                    onClick={() => handleThemeChange("rgb(45, 17, 17)")}
+                    onClick={() => handleThemeChange("rgb(185, 210, 61)")}
                   ></div>
                   <div
                     className="color-blue-div"

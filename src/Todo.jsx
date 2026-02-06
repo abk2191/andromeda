@@ -42,6 +42,9 @@ function Todo() {
     return {};
   });
 
+  // New state for modal closing animation
+  const [isModalClosing, setIsModalClosing] = useState(false);
+
   //*******************************************************************************/
   //*******************************************************************************/
 
@@ -396,12 +399,24 @@ function Todo() {
     }
   }
 
+  // Function to handle backdrop click (with animation)
+  function handleBackdropClick() {
+    closeTodo();
+  }
+
+  // Function to handle closing todo with animation
   function closeTodo() {
-    setTodoActive(false);
-    setSelectedTodoIndex(null);
-    setIsTodoPinned(false);
-    setEditingTitle("");
-    setColorSelectorActiveTodoId(null);
+    setIsModalClosing(true);
+
+    // Wait for animation to complete before removing the modal
+    setTimeout(() => {
+      setTodoActive(false);
+      setIsModalClosing(false);
+      setSelectedTodoIndex(null);
+      setIsTodoPinned(false);
+      setEditingTitle("");
+      setColorSelectorActiveTodoId(null);
+    }, 400); // Match this duration with your CSS animation duration
   }
 
   function showDeleteConfirmation(todoId, e) {
@@ -1334,9 +1349,9 @@ function Todo() {
       {/* Modal overlay for viewing/editing a single todo list */}
       {todoActive && currentTodo && (
         <>
-          <div className="backdrop" onClick={closeTodo}></div>
+          <div className="backdrop" onClick={handleBackdropClick}></div>
           <div
-            className="notes-modal"
+            className={`notes-modal ${isModalClosing ? "modal-closing" : ""}`}
             style={{
               backgroundColor: currentTodoColor,
             }}
@@ -1369,7 +1384,7 @@ function Todo() {
                 </div>
               </div>
               <div className="cls-btn-div">
-                <button className="cls-nt-btn" onClick={closeTodo}>
+                <button className="cls-nt-btn" onClick={() => closeTodo()}>
                   <i className="fa-solid fa-xmark"></i>
                 </button>
               </div>

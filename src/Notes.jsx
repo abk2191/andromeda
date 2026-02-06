@@ -34,6 +34,9 @@ function Notes() {
     return {};
   });
 
+  // New state for modal closing animation
+  const [isModalClosing, setIsModalClosing] = useState(false);
+
   //*******************************************************************************/
   //*******************************************************************************/
 
@@ -128,6 +131,7 @@ function Notes() {
     };
     checkAuth();
   }, []);
+
   // Update this function to use getAllData properly:
   const loadAllDataFromFirestore = async () => {
     console.log("🔄 Loading data for current user...");
@@ -361,11 +365,23 @@ function Notes() {
     }
   }
 
+  // Function to handle backdrop click (with animation)
+  function handleBackdropClick() {
+    closeNote();
+  }
+
+  // Function to handle closing note with animation
   function closeNote() {
-    setNoteActive(false);
-    setSelectedNoteIndex(null);
-    setIsNotePinned(false);
-    setColorSelectorActiveNoteId(null);
+    setIsModalClosing(true);
+
+    // Wait for animation to complete before removing the modal
+    setTimeout(() => {
+      setNoteActive(false);
+      setIsModalClosing(false);
+      setSelectedNoteIndex(null);
+      setIsNotePinned(false);
+      setColorSelectorActiveNoteId(null);
+    }, 400); // Match this duration with your CSS animation duration
   }
 
   function showDeleteConfirmation(noteId, e) {
@@ -955,9 +971,9 @@ function Notes() {
       {/* Modal overlay for viewing/editing a single note */}
       {noteActive && selectedNoteIndex !== null && (
         <>
-          <div className="backdrop" onClick={closeNote}></div>
+          <div className="backdrop" onClick={handleBackdropClick}></div>
           <div
-            className="notes-modal"
+            className={`notes-modal ${isModalClosing ? "modal-closing" : ""}`}
             style={{
               backgroundColor: isNotePinned
                 ? noteColors[pinnedNotes[selectedNoteIndex]?.id] || "#000033"
@@ -1026,7 +1042,7 @@ function Notes() {
                 </div>
               </div>
               <div className="cls-btn-div">
-                <button className="cls-nt-btn" onClick={closeNote}>
+                <button className="cls-nt-btn" onClick={() => closeNote()}>
                   <i className="fa-solid fa-xmark"></i>
                 </button>
               </div>
