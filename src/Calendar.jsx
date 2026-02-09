@@ -2151,10 +2151,10 @@ function Calendar() {
                           }`}
                           style={{
                             color: date === todayDate ? "red" : "black",
-                            textShadow:
-                              date === todayDate
-                                ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
-                                : "none",
+                            // textShadow:
+                            //   date === todayDate
+                            //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
+                            //     : "none",
                             fontWeight: "bold",
                             fontSize: "20px",
                             backgroundColor: getEventColorForDate(date),
