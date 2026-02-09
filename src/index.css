@@ -2567,6 +2567,18 @@ html {
   color: #000033;
 }
 
+.action-buttons {
+  height: 35px;
+  width: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  background: none;
+  border: 1px solid #000033;
+  color: #000033;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,
