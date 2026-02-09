@@ -1489,9 +1489,9 @@ function Calendar() {
             className="month-title"
             style={{
               margin: 0,
-              fontSize: "16px",
+              fontSize: "12px",
               color: "black",
-              fontWeight: "bold",
+              // fontWeight: "bold",
             }}
           >
             {monthName.substring(0, 3)}
