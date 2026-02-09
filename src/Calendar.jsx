@@ -2006,15 +2006,29 @@ function Calendar() {
           </span>
         </button> */}
 
-        <button className="calendar_button" onClick={handleYearButtonClick}>
+        {/* <button className="calendar_button" onClick={handleYearButtonClick}>
           <span class="calendar_button_top">
             {" "}
             &nbsp;&nbsp;Year&nbsp;&nbsp;{" "}
           </span>
+        </button> */}
+
+        <button
+          onClick={handleYearButtonClick}
+          className="calendar-action-button"
+        >
+          Year
         </button>
 
-        <button className="calendar_button" onClick={handleMonthButtonClick}>
+        {/* <button className="calendar_button" onClick={handleMonthButtonClick}>
           <span class="calendar_button_top"> Month </span>
+        </button> */}
+
+        <button
+          onClick={handleMonthButtonClick}
+          className="calendar-action-button"
+        >
+          Month
         </button>
       </div>
 

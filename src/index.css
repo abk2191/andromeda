@@ -2557,6 +2557,18 @@ html {
   transform: translateY(0);
 }
 
+.calendar-action-button {
+  height: 50px;
+  width: 120px;
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #13d162;
+  border-radius: 4px;
+  background-color: #13d162;
+  color: white;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,
