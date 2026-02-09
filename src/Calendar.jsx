@@ -1490,7 +1490,7 @@ function Calendar() {
             style={{
               margin: 0,
               fontSize: "16px",
-              color: "white",
+              color: "black",
               fontWeight: "bold",
             }}
           >
