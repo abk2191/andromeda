@@ -1253,12 +1253,9 @@ function Calendar() {
               style={{
                 background: "none",
                 border: "none",
-                color: isDarkTheme ? "white" : "#32327a",
+                color: isDarkTheme ? "white" : "#000033",
                 fontSize: "40px",
                 cursor: "pointer",
-                textShadow: isDarkTheme
-                  ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                  : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
               title="Previous Year"
             >
@@ -1277,10 +1274,10 @@ function Calendar() {
                 style={{
                   fontSize: "28px",
                   margin: 0,
-                  color: isDarkTheme ? "white" : "#32327a",
-                  textShadow: isDarkTheme
-                    ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                    : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
+                  color: isDarkTheme ? "white" : "#000033",
+                  // textShadow: isDarkTheme
+                  //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
+                  //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
                 }}
               >
                 {year}
@@ -1293,12 +1290,9 @@ function Calendar() {
               style={{
                 background: "none",
                 border: "none",
-                color: isDarkTheme ? "white" : "#32327a",
+                color: isDarkTheme ? "white" : "#000033",
                 fontSize: "40px",
                 cursor: "pointer",
-                textShadow: isDarkTheme
-                  ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                  : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
             >
               <i class="fa-solid fa-angles-right"></i>

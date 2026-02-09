@@ -1999,13 +1999,11 @@ html {
 
 .clock {
   font-family: "Inter", sans-serif;
-  color: #32327a;
+  color: #000033;
   font-weight: bold;
   font-size: 25px;
   margin-top: 30px;
-  text-shadow:
-    0 0 10px #32327a,
-    0 0 20px rgba(255, 255, 255, 0.5);
+
   transition:
     color 0.3s ease,
     text-shadow 0.3s ease;
@@ -2566,6 +2564,7 @@ html {
   cursor: pointer;
   background: none;
   border: none;
+  color: #000033;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
