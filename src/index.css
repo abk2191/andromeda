@@ -1574,7 +1574,7 @@ html {
   margin-top: 35px;
 
   background-color: transparent;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgb(224, 224, 224);
   padding: 40px;
 
   transition: background-color 0.3s ease;

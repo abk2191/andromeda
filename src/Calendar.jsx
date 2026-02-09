@@ -2082,7 +2082,7 @@ function Calendar() {
                 })()}
               </div>
               <div className="day-names-div" style={{ color: "black " }}>
-                <p>SU</p>
+                <p style={{ color: "red" }}>SU</p>
                 <p>MO</p>
                 <p>TU</p>
                 <p>WE</p>
