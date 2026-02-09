@@ -1572,9 +1572,9 @@ html {
   width: 500px;
   flex-direction: column;
   margin-top: 35px;
-  border: 1px solid black;
+
   background-color: transparent;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   padding: 40px;
   border-radius: 4px;
   transition: background-color 0.3s ease;
