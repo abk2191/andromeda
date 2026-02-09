@@ -1572,11 +1572,11 @@ html {
   width: 500px;
   flex-direction: column;
   margin-top: 35px;
-  border: 1px solid #32327a;
-  background-color: #32327a;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid black;
+  background-color: transparent;
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); */
   padding: 40px;
-  border-radius: 10px;
+  border-radius: 4px;
   transition: background-color 0.3s ease;
 }
 
@@ -1867,7 +1867,7 @@ html {
 }
 
 .day-names-div p {
-  color: white;
+  color: black;
   font-weight: bold;
   transition: color 0.3s ease;
 }
@@ -1888,6 +1888,10 @@ html {
   gap: 20px;
   text-align: center;
   margin-bottom: 25px;
+}
+
+.month-name i {
+  color: black;
 }
 
 .mood-select {
@@ -2501,6 +2505,56 @@ html {
 
 .new-note-button:active {
   border: 1px solid #2e8644;
+}
+
+/* From Uiverse.io by Voxybuns */
+.calendar_button {
+  /* Variables */
+  --button_radius: 0.75em;
+  --button_color: #e8e8e8;
+  --button_outline_color: #4a4a4a;
+  font-size: 17px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--button_radius);
+  background: var(--button_outline_color);
+}
+
+/* From Uiverse.io by Voxybuns */
+.calendar_button {
+  /* Variables */
+  --button_radius: 0.75em;
+  --button_color: #e8e8e8;
+  --button_outline_color: #4a4a4a;
+  font-size: 17px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--button_radius);
+  background: var(--button_outline_color);
+}
+
+.calendar_button_top {
+  display: block;
+  box-sizing: border-box;
+  border: 2px solid var(--button_outline_color);
+  border-radius: var(--button_radius);
+  padding: 0.75em 1.5em;
+  background: var(--button_color);
+  color: var(--button_outline_color);
+  transform: translateY(-0.2em);
+  transition: transform 0.1s ease;
+}
+
+/* .calendar_button:hover .calendar_button_top {
+  
+  transform: translateY(-0.33em);
+} */
+
+.calendar_button:active .calendar_button_top {
+  /* Push the button downwards when pressed */
+  transform: translateY(0);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */

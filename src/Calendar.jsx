@@ -1332,10 +1332,11 @@ function Calendar() {
                     key={monthName}
                     className="month-card"
                     style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
+                      backgroundColor: isDarkTheme ? "#000033" : "white",
+                      borderRadius: "4px",
+                      // border: "1px solid grey",
                       padding: "5px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
                     }}
                     onClick={() => handleMonthCardClick(monthName)}
@@ -1372,10 +1373,10 @@ function Calendar() {
                     key={monthName}
                     className="month-card"
                     style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
+                      backgroundColor: isDarkTheme ? "#000033" : "white",
+                      borderRadius: "4px",
                       padding: "10px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
                     }}
                     onClick={() => handleMonthCardClick(monthName)}
@@ -1412,10 +1413,10 @@ function Calendar() {
                     key={monthName}
                     className="month-card"
                     style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
+                      backgroundColor: isDarkTheme ? "#000033" : "white",
+                      borderRadius: "4px",
                       padding: "10px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
                     }}
                     onClick={() => handleMonthCardClick(monthName)}
@@ -1451,8 +1452,8 @@ function Calendar() {
                     key={monthName}
                     className="month-card"
                     style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
+                      backgroundColor: isDarkTheme ? "#000033" : "white",
+                      borderRadius: "4px",
                       padding: "10px",
                       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
@@ -1517,7 +1518,7 @@ function Calendar() {
               style={{
                 fontSize: "12px",
                 textAlign: "center",
-                color: "white",
+                color: "black",
                 fontWeight: "bold",
                 flex: "1",
                 minWidth: "0",
@@ -1587,7 +1588,7 @@ function Calendar() {
                           ? "#32327a"
                           : "#000033"
                         : "transparent",
-                      color: isToday ? "red" : hasEvent ? "white" : "white",
+                      color: isToday ? "red" : hasEvent ? "green" : "black",
                       textShadow: isToday ? "0 0 3px red" : "none",
                       borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
@@ -1979,42 +1980,40 @@ function Calendar() {
         }}
         className="toggle-buttons-container"
       >
-        <button
-          className="month-year-nav-btn"
+        {/* <button
+          type="button"
+          class="new-note-button"
           onClick={handleYearButtonClick}
-          // style={{
-          //   padding: "12px 24px",
-          //   backgroundColor: "#000033",
-          //   color: "white",
-          //   border: "none",
-          //   borderRadius: "8px",
-          //   fontSize: "16px",
-          //   fontWeight: "bold",
-          //   cursor: "pointer",
-          //   minWidth: "100px",
-          //   minHeight: "44px",
-          // }}
         >
-          <span class="button_top"> Year </span>
+          <span class="button__text">Year</span>
+          <span class="button__icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke="currentColor"
+              height="24"
+              fill="none"
+              class="svg"
+            >
+              <line y2="19" y1="5" x2="12" x1="12"></line>
+              <line y2="12" y1="12" x2="19" x1="5"></line>
+            </svg>
+          </span>
+        </button> */}
+
+        <button className="calendar_button" onClick={handleYearButtonClick}>
+          <span class="calendar_button_top">
+            {" "}
+            &nbsp;&nbsp;Year&nbsp;&nbsp;{" "}
+          </span>
         </button>
 
-        <button
-          className="month-year-nav-btn"
-          onClick={handleMonthButtonClick}
-          // style={{
-          //   padding: "12px 24px",
-          //   backgroundColor: "#000033",
-          //   color: "white",
-          //   border: "none",
-          //   borderRadius: "8px",
-          //   fontSize: "16px",
-          //   fontWeight: "bold",
-          //   cursor: "pointer",
-          //   minWidth: "100px",
-          //   minHeight: "44px",
-          // }}
-        >
-          <span class="button_top"> Month </span>
+        <button className="calendar_button" onClick={handleMonthButtonClick}>
+          <span class="calendar_button_top"> Month </span>
         </button>
       </div>
 
@@ -2031,7 +2030,7 @@ function Calendar() {
                 </button>
                 <h1
                   style={{
-                    color: "white",
+                    color: "black",
                     fontSize: "22px",
                   }}
                 >
@@ -2047,7 +2046,7 @@ function Calendar() {
                 onClick={handleMood}
                 style={{
                   fontSize: "15px",
-                  color: "greenyellow",
+                  color: "black",
                   marginBottom: "12px",
                 }}
               >
@@ -2081,7 +2080,7 @@ function Calendar() {
                   );
                 })()}
               </div>
-              <div className="day-names-div">
+              <div className="day-names-div" style={{ color: "black " }}>
                 <p>SU</p>
                 <p>MO</p>
                 <p>TU</p>
@@ -2136,7 +2135,7 @@ function Calendar() {
                             hasEvent ? "has-event" : ""
                           }`}
                           style={{
-                            color: date === todayDate ? "red" : "inherit",
+                            color: date === todayDate ? "red" : "black",
                             textShadow:
                               date === todayDate
                                 ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
