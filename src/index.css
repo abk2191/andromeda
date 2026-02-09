@@ -2559,13 +2559,17 @@ html {
 
 .calendar-action-button {
   height: 35px;
-  width: 120px;
+  width: 80px;
   font-family: "Inter", sans-serif;
-  font-size: 16px;
+  font-size: 23px;
+  font-weight: bold;
   cursor: pointer;
-  border: 0.5px solid gray;
-  border-radius: 4px;
-  background-color: whitesmoke;
+  background: none;
+  border: none;
+}
+
+.calendar-action-button:focus {
+  color: yellow;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
