@@ -2035,19 +2035,25 @@ function Calendar() {
             <div className="clndr-wrpr">
               <div className="month-name">
                 <button onClick={goToPrevMonth} className="prev-mnth-btn">
-                  <i class="fa-solid fa-angles-left"></i>
+                  <i
+                    class="fa-solid fa-angles-left"
+                    style={{ fontSize: "20px" }}
+                  ></i>
                 </button>
-                <h1
+                <p
                   style={{
                     color: "black",
                     fontSize: "22px",
                   }}
                 >
                   {formatted}
-                </h1>
+                </p>
 
                 <button onClick={goToNextMonth} className="nxt-mnth-btn">
-                  <i class="fa-solid fa-angles-right"></i>
+                  <i
+                    class="fa-solid fa-angles-right"
+                    style={{ fontSize: "20px" }}
+                  ></i>
                 </button>
               </div>
               <div
@@ -2154,7 +2160,7 @@ function Calendar() {
                             //   date === todayDate
                             //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
                             //     : "none",
-                            fontWeight: "bold",
+                            // fontWeight: "bold",
                             fontSize: "20px",
                             // backgroundColor: getEventColorForDate(date),
                             cursor: "pointer",
