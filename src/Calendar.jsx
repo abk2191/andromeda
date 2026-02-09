@@ -1254,7 +1254,7 @@ function Calendar() {
                 background: "none",
                 border: "none",
                 color: isDarkTheme ? "white" : "#000033",
-                fontSize: "25px",
+                fontSize: "22px",
                 cursor: "pointer",
               }}
               title="Previous Year"
@@ -1272,7 +1272,7 @@ function Calendar() {
             >
               <h2
                 style={{
-                  fontSize: "25px",
+                  fontSize: "22px",
                   margin: 0,
                   color: isDarkTheme ? "white" : "#000033",
                   // textShadow: isDarkTheme
@@ -1291,7 +1291,7 @@ function Calendar() {
                 background: "none",
                 border: "none",
                 color: isDarkTheme ? "white" : "#000033",
-                fontSize: "25px",
+                fontSize: "22px",
                 cursor: "pointer",
               }}
             >
