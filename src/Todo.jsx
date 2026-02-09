@@ -1022,7 +1022,7 @@ function Todo() {
                   </button> */}
 
                   <button className="action-buttons" onClick={newTodo}>
-                    Add Note +
+                    Add List +
                   </button>
                 </div>
 
