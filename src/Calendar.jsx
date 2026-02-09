@@ -1333,7 +1333,7 @@ function Calendar() {
                     className="month-card"
                     style={{
                       backgroundColor: isDarkTheme ? "#000033" : "white",
-                      borderRadius: "4px",
+                      border: "1px solid rgb(224, 224, 224)",
                       // border: "1px solid grey",
                       padding: "5px",
                       // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -1374,7 +1374,7 @@ function Calendar() {
                     className="month-card"
                     style={{
                       backgroundColor: isDarkTheme ? "#000033" : "white",
-                      borderRadius: "4px",
+                      border: "1px solid rgb(224, 224, 224)",
                       padding: "10px",
                       // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
@@ -1414,7 +1414,7 @@ function Calendar() {
                     className="month-card"
                     style={{
                       backgroundColor: isDarkTheme ? "#000033" : "white",
-                      borderRadius: "4px",
+                      border: "1px solid rgb(224, 224, 224)",
                       padding: "10px",
                       // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
@@ -1453,9 +1453,10 @@ function Calendar() {
                     className="month-card"
                     style={{
                       backgroundColor: isDarkTheme ? "#000033" : "white",
-                      borderRadius: "4px",
+
+                      border: "1px solid rgb(224, 224, 224)",
                       padding: "10px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       cursor: "pointer",
                     }}
                     onClick={() => handleMonthCardClick(monthName)}
