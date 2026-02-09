@@ -2011,7 +2011,7 @@ function Calendar() {
           onClick={handleYearButtonClick}
           className="calendar-action-button"
         >
-          Year
+          Year View
         </button>
 
         {/* <button className="calendar_button" onClick={handleMonthButtonClick}>
@@ -2022,7 +2022,7 @@ function Calendar() {
           onClick={handleMonthButtonClick}
           className="calendar-action-button"
         >
-          Month
+          Month View
         </button>
       </div>
 

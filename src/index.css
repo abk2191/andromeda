@@ -2557,13 +2557,13 @@ html {
 
 .calendar-action-button {
   height: 35px;
-  width: 80px;
+  width: 100px;
   font-family: "Inter", sans-serif;
-  font-size: 23px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   background: none;
-  border: none;
+  border: 1px solid #000033;
   color: #000033;
 }
 
