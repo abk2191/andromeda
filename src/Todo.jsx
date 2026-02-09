@@ -996,7 +996,7 @@ function Todo() {
                     <span className="button_top"> ADD TODO </span>
                   </button> */}
 
-                  <button
+                  {/* <button
                     type="button"
                     class="new-note-button"
                     onClick={newTodo}
@@ -1019,6 +1019,10 @@ function Todo() {
                         <line y2="12" y1="12" x2="19" x1="5"></line>
                       </svg>
                     </span>
+                  </button> */}
+
+                  <button className="action-buttons" onClick={newTodo}>
+                    Add Note +
                   </button>
                 </div>
 
