@@ -1584,11 +1584,11 @@ function Calendar() {
                       fontSize: "12px",
                       textAlign: "center",
                       padding: "2px 0",
-                      backgroundColor: hasEvent
-                        ? isDarkTheme
-                          ? "#32327a"
-                          : "#000033"
-                        : "transparent",
+                      // backgroundColor: hasEvent
+                      //   ? isDarkTheme
+                      //     ? "#32327a"
+                      //     : "#000033"
+                      //   : "transparent",
                       color: isToday ? "red" : hasEvent ? "green" : "black",
                       textShadow: isToday ? "0 0 3px red" : "none",
                       borderRadius: hasEvent ? "3px" : "0",
@@ -2150,14 +2150,19 @@ function Calendar() {
                             hasEvent ? "has-event" : ""
                           }`}
                           style={{
-                            color: date === todayDate ? "red" : "black",
+                            color:
+                              date === todayDate
+                                ? "red"
+                                : hasEvent
+                                  ? "green"
+                                  : "black",
                             // textShadow:
                             //   date === todayDate
                             //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
                             //     : "none",
                             fontWeight: "bold",
                             fontSize: "20px",
-                            backgroundColor: getEventColorForDate(date),
+                            // backgroundColor: getEventColorForDate(date),
                             cursor: "pointer",
                             ...borderStyle,
                             padding: "2px 8px",
