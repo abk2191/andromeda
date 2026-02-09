@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import EventEditor from "./EventEditor";
 import LiveClock from "./LiveClock";
 import {
-  saveAllData,
-  getAllData,
   saveCalendarData,
   loadCalendarData,
   saveCalendarMoods,
@@ -22,10 +20,8 @@ function useDarkTheme() {
       setIsDarkTheme(document.body.classList.contains("dark-theme"));
     };
 
-    // Check initially
     checkTheme();
 
-    // Create a MutationObserver to watch for theme changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (
@@ -37,10 +33,7 @@ function useDarkTheme() {
       });
     });
 
-    // Observe body for class changes
     observer.observe(document.body, { attributes: true });
-
-    // Also observe documentElement (html) for class changes
     observer.observe(document.documentElement, { attributes: true });
 
     return () => observer.disconnect();
@@ -52,45 +45,27 @@ function useDarkTheme() {
 function Calendar() {
   const reminderTimeoutsRef = useRef({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load events from localStorage on initial render
-  const [event, setEvent] = useState(() => {
-    const savedEvents = localStorage.getItem("calendarEvents");
-    return savedEvents ? JSON.parse(savedEvents) : [];
-  });
-
-  const [currentView, setCurrentView] = useState("month"); // "month" or "year"
-
-  const [moods, setMoods] = useState(() => {
-    const savedMoods = localStorage.getItem("calendarMoods");
-    return savedMoods ? JSON.parse(savedMoods) : [];
-  });
-
+  // All states initialized as empty - will be populated by Firestore
+  const [event, setEvent] = useState([]);
+  const [currentView, setCurrentView] = useState("month");
+  const [moods, setMoods] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [eventViewerActive, setEventViewerActive] = useState(false);
   const [viewerBg, setViewerBg] = useState("#000033");
-
   const [yearViewYear, setYearViewYear] = useState(new Date().getFullYear());
-
-  // Add state for current month and year
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-
-  const [reminders, setReminders] = useState(() => {
-    const saved = localStorage.getItem("calendarReminders");
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  const [reminders, setReminders] = useState([]);
   const [showEventEditor, setShowEventEditor] = useState(false);
   const [deleteWarningActive, setDeleteWarningActive] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [dateColors, setDateColors] = useState({});
 
-  // NEW: Add state for date-specific colors
-  const [dateColors, setDateColors] = useState(() => {
-    const savedColors = localStorage.getItem("calendarDateColors");
-    return savedColors ? JSON.parse(savedColors) : {};
-  });
+  // Track if data has been loaded to prevent overwriting
+  const hasLoadedRef = useRef(false);
 
   //********************************************************************/
 
@@ -101,11 +76,13 @@ function Calendar() {
         if (user && !user.isAnonymous) {
           console.log("✅ Calendar: User signed in:", user.email, user.uid);
           setIsAuthenticated(true);
-          loadAllCalendarData(); // Load user-specific data
+          // Reset loading flag when user changes
+          hasLoadedRef.current = false;
+          loadAllCalendarData();
         } else {
           console.log("👤 Calendar: No user signed in or anonymous");
           setIsAuthenticated(false);
-          // Clear data if user signs out
+          setIsLoading(false);
           if (user === null) {
             setEvent([]);
             setMoods([]);
@@ -120,7 +97,13 @@ function Calendar() {
 
   // Load all calendar data from Firestore
   const loadAllCalendarData = async () => {
+    if (!isAuthenticated || hasLoadedRef.current) {
+      setIsLoading(false);
+      return;
+    }
+
     console.log("🔄 Loading calendar data for current user...");
+    setIsLoading(true);
 
     try {
       const loadedEvents = await loadCalendarData();
@@ -134,6 +117,8 @@ function Calendar() {
       setDateColors(loadedDateColors || {});
       setReminders(loadedReminders || []);
 
+      hasLoadedRef.current = true;
+
       console.log("📊 Calendar data loaded:", {
         events: loadedEvents?.length || 0,
         moods: loadedMoods?.length || 0,
@@ -142,111 +127,107 @@ function Calendar() {
       });
     } catch (error) {
       console.error("Error loading calendar data from Firestore:", error);
-      // Fallback to localStorage
-      const savedEvents = localStorage.getItem("calendarEvents");
-      const savedMoods = localStorage.getItem("calendarMoods");
-      const savedDateColors = localStorage.getItem("calendarDateColors");
-      const savedReminders = localStorage.getItem("calendarReminders");
-
-      if (savedEvents) setEvent(JSON.parse(savedEvents));
-      if (savedMoods) setMoods(JSON.parse(savedMoods));
-      if (savedDateColors) setDateColors(JSON.parse(savedDateColors));
-      if (savedReminders) setReminders(JSON.parse(savedReminders));
-    }
-  };
-
-  // Save events to Firestore when they change
-  useEffect(() => {
-    const saveEvents = async () => {
-      await saveCalendarData(event);
-    };
-    if (event.length > 0) {
-      saveEvents();
-    }
-  }, [event]);
-
-  // Save moods to Firestore when they change
-  useEffect(() => {
-    const saveMoods = async () => {
-      await saveCalendarMoods(moods);
-    };
-    if (moods.length > 0) {
-      saveMoods();
-    }
-  }, [moods]);
-
-  // Save date colors to Firestore when they change
-  useEffect(() => {
-    const saveDateColors = async () => {
-      await saveCalendarDateColors(dateColors);
-    };
-    if (Object.keys(dateColors).length > 0) {
-      saveDateColors();
-    }
-  }, [dateColors]);
-
-  // Save reminders to Firestore when they change
-  useEffect(() => {
-    const saveReminders = async () => {
-      await saveCalendarReminders(reminders);
-    };
-    if (reminders.length > 0) {
-      saveReminders();
-    }
-  }, [reminders]);
-
-  // Add Google sign-in/sign-out functions (similar to Notes/Todos)
-  const handleGoogleSignIn = async () => {
-    try {
-      const { auth, googleProvider, signInWithPopup } =
-        await import("./firebase.js");
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      alert(`Signed in as: ${user.email}`);
-      window.location.reload();
-    } catch (error) {
-      console.error("❌ Google sign-in failed:", error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const { auth, signOut } = await import("./firebase.js");
-      await signOut(auth);
-      window.location.reload();
-    } catch (error) {
-      console.error("❌ Sign out failed:", error);
-    }
-  };
-
-  const handleClearUserData = () => {
-    if (window.confirm("Clear all local calendar data?")) {
-      localStorage.removeItem("calendarEvents");
-      localStorage.removeItem("calendarMoods");
-      localStorage.removeItem("calendarDateColors");
-      localStorage.removeItem("calendarReminders");
-
       setEvent([]);
       setMoods([]);
       setDateColors({});
       setReminders([]);
-
-      alert("Local calendar data cleared.");
+      hasLoadedRef.current = true;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  //*******************************************************************/
+  // Also load data when component mounts and user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && !hasLoadedRef.current) {
+      loadAllCalendarData();
+    }
+  }, [isAuthenticated]);
+
+  // Save events to Firestore when they change
+  useEffect(() => {
+    const saveEvents = async () => {
+      if (isAuthenticated && hasLoadedRef.current) {
+        try {
+          console.log("💾 Saving events to Firestore:", event.length);
+          await saveCalendarData(event);
+          console.log("✅ Events saved to Firestore");
+        } catch (error) {
+          console.error("❌ Error saving events to Firestore:", error);
+        }
+      }
+    };
+
+    if (hasLoadedRef.current) {
+      saveEvents();
+    }
+  }, [event, isAuthenticated]);
+
+  // Save moods to Firestore when they change
+  useEffect(() => {
+    const saveMoods = async () => {
+      if (isAuthenticated && hasLoadedRef.current) {
+        try {
+          console.log("💾 Saving moods to Firestore:", moods.length);
+          await saveCalendarMoods(moods);
+          console.log("✅ Moods saved to Firestore");
+        } catch (error) {
+          console.error("❌ Error saving moods to Firestore:", error);
+        }
+      }
+    };
+
+    if (hasLoadedRef.current) {
+      saveMoods();
+    }
+  }, [moods, isAuthenticated]);
+
+  // Save date colors to Firestore when they change
+  useEffect(() => {
+    const saveDateColors = async () => {
+      if (isAuthenticated && hasLoadedRef.current) {
+        try {
+          console.log(
+            "💾 Saving date colors to Firestore:",
+            Object.keys(dateColors).length,
+          );
+          await saveCalendarDateColors(dateColors);
+          console.log("✅ Date colors saved to Firestore");
+        } catch (error) {
+          console.error("❌ Error saving date colors to Firestore:", error);
+        }
+      }
+    };
+
+    if (hasLoadedRef.current) {
+      saveDateColors();
+    }
+  }, [dateColors, isAuthenticated]);
+
+  // Save reminders to Firestore when they change
+  useEffect(() => {
+    const saveReminders = async () => {
+      if (isAuthenticated && hasLoadedRef.current) {
+        try {
+          console.log("💾 Saving reminders to Firestore:", reminders.length);
+          await saveCalendarReminders(reminders);
+          console.log("✅ Reminders saved to Firestore");
+        } catch (error) {
+          console.error("❌ Error saving reminders to Firestore:", error);
+        }
+      }
+    };
+
+    if (hasLoadedRef.current) {
+      saveReminders();
+    }
+  }, [reminders, isAuthenticated]);
 
   const isDarkTheme = useDarkTheme();
 
   useEffect(() => {
-    // ----------------------------
-    // 1️⃣ EXACT MIDNIGHT RELOAD
-    // ----------------------------
     function scheduleMidnightReload() {
       const now = new Date();
-
-      // Next midnight
       const midnight = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -258,7 +239,6 @@ function Calendar() {
       );
 
       const msUntilMidnight = midnight - now;
-
       console.log("Reload scheduled in", msUntilMidnight, "ms");
 
       return setTimeout(() => {
@@ -269,15 +249,11 @@ function Calendar() {
 
     const midnightTimeout = scheduleMidnightReload();
 
-    // ----------------------------------------------------------
-    // 2️⃣ RELOAD WHEN USER RETURNS (IF TAB WAS SUSPENDED / FROZEN)
-    // ----------------------------------------------------------
     function checkDateOnReturn() {
-      const lastOpen = localStorage.getItem("lastCalendarOpen");
+      const lastOpen = sessionStorage.getItem("lastCalendarOpen");
       const today = new Date().toDateString();
 
       if (lastOpen !== today) {
-        // The day changed while the tab was inactive → reload now
         console.log("Date changed while backgrounded → reloading...");
         window.location.reload();
       }
@@ -291,12 +267,8 @@ function Calendar() {
 
     window.addEventListener("focus", checkDateOnReturn);
 
-    // ----------------------------------------------------------
-    // 3️⃣ SAVE CURRENT DATE ON OPEN (for comparison)
-    // ----------------------------------------------------------
-    localStorage.setItem("lastCalendarOpen", new Date().toDateString());
+    sessionStorage.setItem("lastCalendarOpen", new Date().toDateString());
 
-    // Clean up
     return () => {
       clearTimeout(midnightTimeout);
       window.removeEventListener("focus", checkDateOnReturn);
@@ -304,67 +276,22 @@ function Calendar() {
     };
   }, []);
 
-  // Fix existing events with wrong endDate calculation on load
-  useEffect(() => {
-    const fixExistingEvents = () => {
-      const savedEvents = localStorage.getItem("calendarEvents");
-      if (!savedEvents) return;
-
-      const events = JSON.parse(savedEvents);
-
-      const fixedEvents = events.map((ev) => {
-        // If it's a multi-month event with wrong endDate calculation
-        if (ev.spansMonths && ev.eventDates && ev.endDate > 31) {
-          // The endDate should be the last day number in the eventDates array
-          const lastDate = ev.eventDates[ev.eventDates.length - 1];
-          return {
-            ...ev,
-            endDate: lastDate,
-          };
-        }
-        return ev;
-      });
-
-      // Only update if there were changes
-      if (JSON.stringify(events) !== JSON.stringify(fixedEvents)) {
-        localStorage.setItem("calendarEvents", JSON.stringify(fixedEvents));
-        setEvent(fixedEvents);
-      }
-    };
-
-    fixExistingEvents();
-  }, []);
-
-  // NEW: Save date colors to localStorage
-  useEffect(() => {
-    localStorage.setItem("calendarDateColors", JSON.stringify(dateColors));
-  }, [dateColors]);
-
-  // UPDATED: Proper handleSaveEvent with correct multi-month calculation
   const handleSaveEvent = (eventData) => {
     if (!selectedDate) return;
 
-    // Parse start and end dates
     const startDate = parseInt(selectedDate);
     const endDate = eventData.endDate ? parseInt(eventData.endDate) : startDate;
-
-    // Get the last day of the current month
     const lastDayOfCurrentMonth = new Date(
       currentYear,
       currentMonth + 1,
       0,
     ).getDate();
-
-    // Check if event spans across months
-    // If endDate is less than startDate, it means next month
     const spansToNextMonth = endDate < startDate;
 
     if (spansToNextMonth) {
-      // Event spans to next month
       const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
       const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
 
-      // Generate dates for current month (from startDate to end of month)
       const currentMonthDates = [];
       const currentMonthKeys = [];
       for (let d = startDate; d <= lastDayOfCurrentMonth; d++) {
@@ -372,7 +299,6 @@ function Calendar() {
         currentMonthKeys.push(`${currentYear}-${currentMonth + 1}-${d}`);
       }
 
-      // Generate dates for next month (from 1st to endDate)
       const nextMonthDates = [];
       const nextMonthKeys = [];
       for (let d = 1; d <= endDate; d++) {
@@ -380,48 +306,40 @@ function Calendar() {
         nextMonthKeys.push(`${nextYear}-${nextMonth + 1}-${d}`);
       }
 
-      // Combine all dates and keys
       const eventDates = [...currentMonthDates, ...nextMonthDates];
       const dateKeys = [...currentMonthKeys, ...nextMonthKeys];
-
-      // Store actual end date (the day number in next month)
-      const actualEndDate = endDate; // This is the day in next month (e.g., 4)
-
-      // Calculate total days
+      const actualEndDate = endDate;
       const totalDays = eventDates.length;
 
       if (editingEvent) {
-        // Update existing event
-        setEvent((prev) =>
-          prev.map((ev) =>
-            ev.id === editingEvent.id
-              ? {
-                  ...ev,
-                  name: eventData.name,
-                  description: eventData.description,
-                  time: eventData.time,
-                  location: eventData.location,
-                  startDate: startDate, // Day in current month (e.g., 27)
-                  endDate: actualEndDate, // Day in next month (e.g., 4)
-                  totalDays: totalDays,
-                  eventDates: eventDates,
-                  dateKeys: dateKeys,
-                  startMonth: currentMonth,
-                  startYear: currentYear,
-                  endMonth: nextMonth,
-                  endYear: nextYear,
-                  spansMonths: true,
-                }
-              : ev,
-          ),
+        const updatedEvents = event.map((ev) =>
+          ev.id === editingEvent.id
+            ? {
+                ...ev,
+                name: eventData.name,
+                description: eventData.description,
+                time: eventData.time,
+                location: eventData.location,
+                startDate: startDate,
+                endDate: actualEndDate,
+                totalDays: totalDays,
+                eventDates: eventDates,
+                dateKeys: dateKeys,
+                startMonth: currentMonth,
+                startYear: currentYear,
+                endMonth: nextMonth,
+                endYear: nextYear,
+                spansMonths: true,
+              }
+            : ev,
         );
+        setEvent(updatedEvents);
         setEditingEvent(null);
       } else {
-        // Create new event
         const newEvent = {
           id: Date.now(),
-          startDate: startDate, // Day in current month (e.g., 27)
-          endDate: actualEndDate, // Day in next month (e.g., 4)
+          startDate: startDate,
+          endDate: actualEndDate,
           totalDays: totalDays,
           eventDates: eventDates,
           dateKeys: dateKeys,
@@ -442,7 +360,6 @@ function Calendar() {
         setEvent((prev) => [...prev, newEvent]);
       }
     } else {
-      // Event stays within current month
       const actualStartDate = Math.min(startDate, endDate);
       const actualEndDate = Math.max(startDate, endDate);
 
@@ -454,34 +371,29 @@ function Calendar() {
       const dateKeys = eventDates.map(
         (date) => `${currentYear}-${currentMonth + 1}-${date}`,
       );
-
-      // Calculate total days
       const totalDays = eventDates.length;
 
       if (editingEvent) {
-        // Update existing event
-        setEvent((prev) =>
-          prev.map((ev) =>
-            ev.id === editingEvent.id
-              ? {
-                  ...ev,
-                  name: eventData.name,
-                  description: eventData.description,
-                  time: eventData.time,
-                  location: eventData.location,
-                  startDate: actualStartDate,
-                  endDate: actualEndDate,
-                  totalDays: totalDays,
-                  eventDates: eventDates,
-                  dateKeys: dateKeys,
-                  spansMonths: false,
-                }
-              : ev,
-          ),
+        const updatedEvents = event.map((ev) =>
+          ev.id === editingEvent.id
+            ? {
+                ...ev,
+                name: eventData.name,
+                description: eventData.description,
+                time: eventData.time,
+                location: eventData.location,
+                startDate: actualStartDate,
+                endDate: actualEndDate,
+                totalDays: totalDays,
+                eventDates: eventDates,
+                dateKeys: dateKeys,
+                spansMonths: false,
+              }
+            : ev,
         );
+        setEvent(updatedEvents);
         setEditingEvent(null);
       } else {
-        // Create new event
         const newEvent = {
           id: Date.now(),
           startDate: actualStartDate,
@@ -540,20 +452,6 @@ function Calendar() {
       reminderTimeoutsRef.current[reminder.id] = timeoutId;
     });
   }, [reminders]);
-
-  useEffect(() => {
-    localStorage.setItem("calendarReminders", JSON.stringify(reminders));
-  }, [reminders]);
-
-  // Add useEffect to save moods
-  useEffect(() => {
-    localStorage.setItem("calendarMoods", JSON.stringify(moods));
-  }, [moods]);
-
-  // Save events to localStorage whenever event state changes
-  useEffect(() => {
-    localStorage.setItem("calendarEvents", JSON.stringify(event));
-  }, [event]);
 
   async function addReminderForSelectedDate() {
     if (!selectedDate) {
@@ -627,7 +525,6 @@ function Calendar() {
       return false;
     }
 
-    // permission === "default"
     return Notification.requestPermission().then((result) => {
       if (result === "granted") {
         return true;
@@ -640,17 +537,13 @@ function Calendar() {
 
   ensureNotificationPermission();
 
-  // Modified function to accept month and year parameters
   function getMonthDatesByWeekday(month, year) {
-    // Get current date for fallback
     const now = new Date();
     const defaultMonth = now.getMonth();
     const defaultYear = now.getFullYear();
 
-    // Handle month parameter - can be number (0-11) or month name
     let targetMonth;
     if (typeof month === "string") {
-      // Convert month name to number (0-11)
       const monthNames = [
         "january",
         "february",
@@ -668,34 +561,27 @@ function Calendar() {
       const monthLower = month.toLowerCase();
       targetMonth = monthNames.indexOf(monthLower);
       if (targetMonth === -1) {
-        // Invalid month name, fall back to current REAL month (not state)
         targetMonth = defaultMonth;
       }
     } else if (typeof month === "number" && month >= 0 && month <= 11) {
       targetMonth = month;
     } else {
-      // Invalid or undefined month, use current REAL month (not state)
       targetMonth = defaultMonth;
     }
 
-    // Handle year parameter
     let targetYear;
     if (year !== undefined) {
       targetYear = Number(year);
       if (isNaN(targetYear)) {
-        // Invalid year, fall back to current REAL year (not state)
         targetYear = defaultYear;
       }
     } else {
-      // No year provided, use current REAL year (not state)
       targetYear = defaultYear;
     }
 
-    // Get first and last day of month
     const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
     const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
 
-    // Initialize result object with arrays for each day
     const result = {
       Sunday: [],
       Monday: [],
@@ -706,14 +592,12 @@ function Calendar() {
       Saturday: [],
     };
 
-    // Generate all dates in the month
     const currentDate = new Date(firstDayOfMonth);
 
     while (currentDate <= lastDayOfMonth) {
       const dayOfMonth = currentDate.getDate();
-      const dayOfWeek = currentDate.getDay(); // 0=Sunday, 1=Monday, etc.
+      const dayOfWeek = currentDate.getDay();
 
-      // Map day number to day name
       const dayNames = [
         "Sunday",
         "Monday",
@@ -725,24 +609,16 @@ function Calendar() {
       ];
       const dayName = dayNames[dayOfWeek];
 
-      // Add the date to the corresponding day array
       result[dayName].push(dayOfMonth);
-
-      // Move to next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
     return result;
   }
 
-  // const january1991DatesByName = getMonthDatesByWeekday("january", 1991);
-  // console.log("january1991DatesByName:", january1991DatesByName);
-
   function getWeeks(month = currentMonth, year = currentYear) {
     const monthDates = getMonthDatesByWeekday(month, year);
-    console.log(`${year}-${month + 1} dates:`, monthDates);
 
-    // Find which weekday has the 1st day of the month
     let firstDayIndex = -1;
     const dayNames = [
       "Sunday",
@@ -761,12 +637,10 @@ function Calendar() {
       }
     }
 
-    // If 1st day not found (shouldn't happen), return empty array
     if (firstDayIndex === -1) {
       return [];
     }
 
-    // Create all dates array for the month
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const totalDays = lastDayOfMonth.getDate();
@@ -776,13 +650,9 @@ function Calendar() {
       allDates.push(i);
     }
 
-    // Create weeks array
     const weeks = [];
-
-    // First week
     const week1 = Array(7).fill(" ");
 
-    // Fill first week starting from the correct weekday
     for (
       let i = firstDayIndex, dayIndex = 0;
       i < 7 && dayIndex < allDates.length;
@@ -792,8 +662,7 @@ function Calendar() {
     }
     weeks.push(week1);
 
-    // Fill remaining weeks
-    let dayIndex = 7 - firstDayIndex; // Start index for week 2
+    let dayIndex = 7 - firstDayIndex;
 
     while (dayIndex < allDates.length) {
       const week = [];
@@ -802,7 +671,6 @@ function Calendar() {
         week.push(allDates[dayIndex]);
       }
 
-      // If week is not full (last week), fill with spaces
       while (week.length < 7) {
         week.push(" ");
       }
@@ -821,19 +689,16 @@ function Calendar() {
         month: "long",
       });
 
-      // Get dates by weekday
       const monthDates = getMonthDatesByWeekday(month, targetYear);
-
-      // Get weeks structure
       const weeks = getWeeks(month, targetYear);
 
       monthsData[monthName] = {
         monthNumber: month,
         year: targetYear,
-        monthDates: monthDates, // Grouped by weekday
-        weeks: weeks, // Calendar grid structure
+        monthDates: monthDates,
+        weeks: weeks,
         totalDays: new Date(targetYear, month + 1, 0).getDate(),
-        firstDay: new Date(targetYear, month, 1).getDay(), // 0=Sunday, 1=Monday, etc.
+        firstDay: new Date(targetYear, month, 1).getDay(),
         monthName: monthName,
       };
     }
@@ -841,10 +706,6 @@ function Calendar() {
     return monthsData;
   }
 
-  const year1991Data = getAllMonthsForYear(1991);
-  const january1991Weeks = year1991Data.January.weeks;
-  console.log("Year 1991 data:", january1991Weeks);
-  // Add navigation functions
   function goToNextMonth() {
     if (currentMonth === 11) {
       setCurrentMonth(0);
@@ -856,11 +717,10 @@ function Calendar() {
 
   function goToPrevMonth() {
     if (currentMonth === 0) {
-      // If current month is January
-      setCurrentMonth(11); // Go to December
-      setCurrentYear((prev) => prev - 1); // Previous year
+      setCurrentMonth(11);
+      setCurrentYear((prev) => prev - 1);
     } else {
-      setCurrentMonth((prev) => prev - 1); // Just go to previous month
+      setCurrentMonth((prev) => prev - 1);
     }
   }
 
@@ -868,11 +728,11 @@ function Calendar() {
     const today = new Date();
     setCurrentMonth(today.getMonth());
     setCurrentYear(today.getFullYear());
-    setCurrentView("month"); // Ensure we're in month view
+    setCurrentView("month");
   }
 
   function updateEventViewer(date) {
-    setSelectedDate(date); // Track which date was clicked
+    setSelectedDate(date);
     setEventViewerActive(true);
   }
 
@@ -894,7 +754,6 @@ function Calendar() {
     const lastDigit = date % 10;
     const lastTwoDigits = date % 100;
 
-    // Special cases for 11th, 12th, 13th
     if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
       return `${date}th`;
     }
@@ -943,29 +802,14 @@ function Calendar() {
     onEventEdit,
     reminders,
   }) {
-    // Filter events for the selected date - check if date is in eventDates
     const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
     const eventsForSelectedDate = event.filter(
       (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
-    // ADD THIS LINE: Get mood for selected date
     const moodForSelectedDate = moods.find((item) => item.dateKey === dateKey);
-
     const day = getDayForDate(selectedDate);
-
-    // NEW: Get background color for this specific date from dateColors
     const backgroundColor = dateColors[dateKey] || viewerBg;
-
-    // DEBUG: Log what's happening
-    console.log("Events for date:", eventsForSelectedDate);
-    console.log("Background color to use:", backgroundColor);
-    console.log("Selected date:", selectedDate);
-    console.log("Date key:", dateKey);
-
-    const remindersForDate = reminders.filter(
-      (r) => r.dateKey === dateKey && !r.fired,
-    );
 
     return (
       <>
@@ -998,10 +842,10 @@ function Calendar() {
             </div>
             <div className="add-evnt-btn">
               <button className="evnt-reminder" onClick={onAddEvent}>
-                <i class="fa-solid fa-square-plus"></i>
+                <i className="fa-solid fa-square-plus"></i>
               </button>
               <button className="evnt-reminder" onClick={onAddReminder}>
-                <i class="fa-solid fa-bell"></i>
+                <i className="fa-solid fa-bell"></i>
               </button>
               <div>
                 <input
@@ -1048,7 +892,6 @@ function Calendar() {
                     borderRadius: "8px",
                   }}
                 >
-                  {/* Event Name */}
                   <div
                     className="event-name"
                     style={{
@@ -1060,10 +903,9 @@ function Calendar() {
                   >
                     {index + 1}.{" "}
                     <span style={{ color: "gold" }}>
-                      <i class="fa-solid fa-tag"></i>
+                      <i className="fa-solid fa-tag"></i>
                     </span>{" "}
                     {item.name}
-                    {/* Show date range if multi-day event */}
                     {item.eventDates && item.eventDates.length > 1 && (
                       <span
                         style={{
@@ -1084,7 +926,6 @@ function Calendar() {
                     }}
                   />
 
-                  {/* Event Description */}
                   {item.description && (
                     <div
                       className="event-desc"
@@ -1096,13 +937,12 @@ function Calendar() {
                       }}
                     >
                       <span style={{ color: "orange" }}>
-                        <i class="fa-solid fa-circle-info"></i>
+                        <i className="fa-solid fa-circle-info"></i>
                       </span>{" "}
                       Description: {item.description}
                     </div>
                   )}
 
-                  {/* Event Time */}
                   {item.time && (
                     <div
                       className="event-time"
@@ -1114,13 +954,12 @@ function Calendar() {
                       }}
                     >
                       <span style={{ color: "yellow" }}>
-                        <i class="fa-solid fa-clock"></i>
+                        <i className="fa-solid fa-clock"></i>
                       </span>{" "}
                       Time: {item.time}
                     </div>
                   )}
 
-                  {/* Event Location */}
                   {item.location && (
                     <div
                       className="event-loc"
@@ -1132,7 +971,7 @@ function Calendar() {
                       }}
                     >
                       <span style={{ color: "green" }}>
-                        <i class="fa-solid fa-location-dot"></i>
+                        <i className="fa-solid fa-location-dot"></i>
                       </span>{" "}
                       Location: {item.location}
                     </div>
@@ -1145,7 +984,6 @@ function Calendar() {
                     }}
                   />
                   <div className="event-dlt-btn">
-                    {/* EDIT BUTTON */}
                     <button
                       className="dlt-evnt-btn"
                       onClick={() => onEventEdit(item.id)}
@@ -1153,10 +991,9 @@ function Calendar() {
                         cursor: "pointer",
                       }}
                     >
-                      <i class="fa-solid fa-pen"></i>
+                      <i className="fa-solid fa-pen"></i>
                     </button>
 
-                    {/* DELETE BUTTON */}
                     <button
                       className="dlt-evnt-btn"
                       onClick={() => onEventDelete(item.id)}
@@ -1164,7 +1001,7 @@ function Calendar() {
                         cursor: "pointer",
                       }}
                     >
-                      <i class="fa-solid fa-trash"></i>
+                      <i className="fa-solid fa-trash"></i>
                     </button>
                   </div>
                 </div>
@@ -1178,11 +1015,6 @@ function Calendar() {
 
   function YearView({ year, isDarkTheme }) {
     const yearData = getAllMonthsForYear(year);
-
-    // Get current theme
-    // const isDarkTheme = document.body.classList.contains("dark-theme");
-
-    // Month names in order
     const monthNames = [
       "January",
       "February",
@@ -1198,7 +1030,6 @@ function Calendar() {
       "December",
     ];
 
-    // Navigation functions for year view
     const handlePrevYear = () => {
       setYearViewYear((prev) => prev - 1);
     };
@@ -1207,12 +1038,9 @@ function Calendar() {
       setYearViewYear((prev) => prev + 1);
     };
 
-    // NEW: Function to handle month card click
     const handleMonthCardClick = (monthName) => {
-      // Get month number (0-11) from month name
       const monthIndex = monthNames.indexOf(monthName);
       if (monthIndex !== -1) {
-        // Switch to month view
         setCurrentMonth(monthIndex);
         setCurrentYear(year);
         setCurrentView("month");
@@ -1247,7 +1075,6 @@ function Calendar() {
               position: "relative",
             }}
           >
-            {/* Previous Year Button */}
             <button
               onClick={handlePrevYear}
               style={{
@@ -1262,10 +1089,9 @@ function Calendar() {
               }}
               title="Previous Year"
             >
-              <i class="fa-solid fa-angles-left"></i>
+              <i className="fa-solid fa-angles-left"></i>
             </button>
 
-            {/* Year Display */}
             <div
               style={{
                 display: "flex",
@@ -1287,7 +1113,6 @@ function Calendar() {
               </h2>
             </div>
 
-            {/* Next Year Button */}
             <button
               onClick={handleNextYear}
               style={{
@@ -1301,7 +1126,7 @@ function Calendar() {
                   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
             >
-              <i class="fa-solid fa-angles-right"></i>
+              <i className="fa-solid fa-angles-right"></i>
             </button>
           </div>
 
@@ -1313,164 +1138,49 @@ function Calendar() {
               gap: "5px",
             }}
           >
-            {/* Row 1: January, February, March */}
-            <div
-              className="month-row"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "5px",
-                marginBottom: "5px",
-              }}
-            >
-              {monthNames.slice(0, 3).map((monthName) => {
-                const monthData = yearData[monthName];
-                const weeks = monthData?.weeks || [];
+            {[0, 3, 6, 9].map((startIndex) => (
+              <div
+                key={startIndex}
+                className="month-row"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "5px",
+                  marginBottom: "5px",
+                }}
+              >
+                {monthNames
+                  .slice(startIndex, startIndex + 3)
+                  .map((monthName) => {
+                    const monthData = yearData[monthName];
+                    const weeks = monthData?.weeks || [];
 
-                return (
-                  <div
-                    key={monthName}
-                    className="month-card"
-                    style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
-                      padding: "5px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleMonthCardClick(monthName)}
-                    title={`Click to view ${monthName} ${year}`}
-                  >
-                    <MonthContent
-                      monthName={monthName}
-                      monthData={monthData}
-                      weeks={weeks}
-                      year={year}
-                      isDarkTheme={isDarkTheme}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Row 2: April, May, June */}
-            <div
-              className="month-row"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "5px",
-                marginBottom: "5px",
-              }}
-            >
-              {monthNames.slice(3, 6).map((monthName) => {
-                const monthData = yearData[monthName];
-                const weeks = monthData?.weeks || [];
-
-                return (
-                  <div
-                    key={monthName}
-                    className="month-card"
-                    style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
-                      padding: "10px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleMonthCardClick(monthName)}
-                    title={`Click to view ${monthName} ${year}`}
-                  >
-                    <MonthContent
-                      monthName={monthName}
-                      monthData={monthData}
-                      weeks={weeks}
-                      year={year}
-                      isDarkTheme={isDarkTheme}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Row 3: July, August, September */}
-            <div
-              className="month-row"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "5px",
-                marginBottom: "5px",
-              }}
-            >
-              {monthNames.slice(6, 9).map((monthName) => {
-                const monthData = yearData[monthName];
-                const weeks = monthData?.weeks || [];
-
-                return (
-                  <div
-                    key={monthName}
-                    className="month-card"
-                    style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
-                      padding: "10px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleMonthCardClick(monthName)}
-                    title={`Click to view ${monthName} ${year}`}
-                  >
-                    <MonthContent
-                      monthName={monthName}
-                      monthData={monthData}
-                      weeks={weeks}
-                      year={year}
-                      isDarkTheme={isDarkTheme}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Row 4: October, November, December */}
-            <div
-              className="month-row"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "5px",
-              }}
-            >
-              {monthNames.slice(9, 12).map((monthName) => {
-                const monthData = yearData[monthName];
-                const weeks = monthData?.weeks || [];
-
-                return (
-                  <div
-                    key={monthName}
-                    className="month-card"
-                    style={{
-                      backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                      borderRadius: "10px",
-                      padding: "10px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleMonthCardClick(monthName)}
-                    title={`Click to view ${monthName} ${year}`}
-                  >
-                    <MonthContent
-                      monthName={monthName}
-                      monthData={monthData}
-                      weeks={weeks}
-                      year={year}
-                      isDarkTheme={isDarkTheme}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+                    return (
+                      <div
+                        key={monthName}
+                        className="month-card"
+                        style={{
+                          backgroundColor: isDarkTheme ? "#000033" : "#32327a",
+                          borderRadius: "10px",
+                          padding: startIndex === 0 ? "5px" : "10px",
+                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleMonthCardClick(monthName)}
+                        title={`Click to view ${monthName} ${year}`}
+                      >
+                        <MonthContent
+                          monthName={monthName}
+                          monthData={monthData}
+                          weeks={weeks}
+                          year={year}
+                          isDarkTheme={isDarkTheme}
+                        />
+                      </div>
+                    );
+                  })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -1502,7 +1212,6 @@ function Calendar() {
           </h3>
         </div>
 
-        {/* Day headers */}
         <div
           className="month-day-headers"
           style={{
@@ -1528,7 +1237,6 @@ function Calendar() {
           ))}
         </div>
 
-        {/* Calendar weeks - using flexbox */}
         <div className="month-weeks">
           {weeks.map((week, weekIndex) => (
             <div
@@ -1540,7 +1248,6 @@ function Calendar() {
               }}
             >
               {week.map((date, dateIndex) => {
-                // Empty cell
                 if (date === " ") {
                   return (
                     <span
@@ -1559,14 +1266,12 @@ function Calendar() {
                   );
                 }
 
-                // Check if this is today
                 const today = new Date();
                 const isToday =
                   year === today.getFullYear() &&
                   monthData.monthNumber === today.getMonth() &&
                   date === today.getDate();
 
-                // Check if has event
                 const dateKey = `${year}-${monthData.monthNumber + 1}-${date}`;
                 const hasEvent = event.some(
                   (item) => item.dateKeys && item.dateKeys.includes(dateKey),
@@ -1598,7 +1303,6 @@ function Calendar() {
                     }}
                     onClick={() => {
                       if (hasEvent) {
-                        // Switch to month view and select this date
                         setCurrentMonth(monthData.monthNumber);
                         setCurrentYear(year);
                         setSelectedDate(date);
@@ -1634,11 +1338,8 @@ function Calendar() {
     return dayNames[dayOfWeek];
   }
 
-  // Update hasEventsForDate to check all events
   function hasEventsForDate(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
-
-    // Check if any event includes this date in its dateKeys array
     return event.some(
       (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
@@ -1649,21 +1350,16 @@ function Calendar() {
     setSelectedDate(false);
   }
 
-  // NEW: Update event viewer background color for this specific date only
   function updateEventViewerBackgroundColor(color) {
     if (!selectedDate) return;
 
     const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
-
-    // Check if there's an event for this date
     const hasEventForDate = event.some(
       (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
-    // ✅ Instantly update UI
     setViewerBg(color);
 
-    // ✅ ONLY update dateColors if there's an event for this date
     if (hasEventForDate) {
       setDateColors((prev) => ({
         ...prev,
@@ -1672,38 +1368,30 @@ function Calendar() {
     }
   }
 
-  // UPDATED: Get event color for a specific date from dateColors
   function getEventColorForDate(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
 
-    // Check if this date has a specific color
     if (dateColors[dateKey]) {
       return dateColors[dateKey];
     }
 
-    // If no specific color, check if there's an event for this date
     const eventForDate = event.find(
       (item) => item.dateKeys && item.dateKeys.includes(dateKey),
     );
 
-    // Return default color if there's an event, otherwise transparent
     return eventForDate ? "#000033" : "transparent";
   }
 
-  // UPDATED: Simple and reliable needsConnectionToRight function
   function needsConnectionToRight(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    // Don't show connection on the last day (it will have special styling)
     if (date === lastDayOfMonth) {
       return false;
     }
 
-    // Check all events
     for (const ev of event) {
       if (ev.dateKeys && ev.dateKeys.includes(dateKey)) {
-        // Check if there's a next date in the same month
         const nextDate = date + 1;
         const nextDateKey = `${currentYear}-${currentMonth + 1}-${nextDate}`;
 
@@ -1715,22 +1403,17 @@ function Calendar() {
     return false;
   }
 
-  // UPDATED: Check if event continues to next month
   function needsConnectionToNextMonth(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    // Only check on the last day of the month
     if (date !== lastDayOfMonth) {
       return false;
     }
 
-    // Check all events
     for (const ev of event) {
       if (ev.dateKeys && ev.dateKeys.includes(dateKey)) {
-        // If this is a multi-month event
         if (ev.spansMonths) {
-          // Check if there's a date in the next month
           const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
           const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
           const nextMonthFirstDayKey = `${nextYear}-${nextMonth + 1}-1`;
@@ -1744,7 +1427,6 @@ function Calendar() {
     return false;
   }
 
-  // Get event connection info for proper styling
   function getEventConnectionInfo(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
     const eventsForDate = event.filter(
@@ -1758,7 +1440,6 @@ function Calendar() {
       };
     }
 
-    // Determine connection classes
     const needsRightConnection = needsConnectionToRight(date);
     const needsNextMonthConnection = needsConnectionToNextMonth(date);
     let connectionClass = "";
@@ -1776,29 +1457,23 @@ function Calendar() {
   }
 
   function handleMood() {
-    // Get today's date
     const today = new Date();
     const todayDate = today.getDate();
     const todayMonth = today.getMonth();
     const todayYear = today.getFullYear();
 
-    // Create unique date key
     const dateKey = `${todayYear}-${todayMonth + 1}-${todayDate}`;
-
-    // Get mood from user
     const mood = window.prompt("Enter mood (emoji):");
 
     if (mood === null || mood.trim() === "") {
-      return; // User cancelled or entered empty
+      return;
     }
 
-    // Check if mood already exists for today
     const existingMoodIndex = moods.findIndex(
       (item) => item.dateKey === dateKey,
     );
 
     if (existingMoodIndex !== -1) {
-      // Update existing mood
       setMoods((prev) =>
         prev.map((m, index) =>
           index === existingMoodIndex ? { ...m, mood: mood } : m,
@@ -1806,7 +1481,6 @@ function Calendar() {
       );
       alert(`Mood updated for today!`);
     } else {
-      // Create new mood entry
       const newMood = {
         id: Date.now(),
         dateKey: dateKey,
@@ -1821,7 +1495,6 @@ function Calendar() {
     }
   }
 
-  // Add function to get mood for a specific date
   function getMoodForDate(date) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
     const moodEntry = moods.find((item) => item.dateKey === dateKey);
@@ -1829,13 +1502,13 @@ function Calendar() {
   }
 
   function onEventDelete(eventId) {
-    setEventToDelete(eventId); // Store the ID of the event to delete
+    setEventToDelete(eventId);
     setDeleteWarningActive(true);
   }
 
   function cancelDelete() {
     setDeleteWarningActive(false);
-    setEventToDelete(null); // Clear the event ID
+    setEventToDelete(null);
   }
 
   function confirmDelete() {
@@ -1844,53 +1517,21 @@ function Calendar() {
       return;
     }
 
-    // Find the event to get its date for cleanup
     const eventToRemove = event.find((e) => e.id === eventToDelete);
-
-    // Create the new events array without the deleted event
     const updatedEvents = event.filter((event) => event.id !== eventToDelete);
 
-    // Immediately update state
+    // Update state immediately
     setEvent(updatedEvents);
 
-    // NEW: Immediately save to Firestore
-    const saveToFirestore = async () => {
-      try {
-        await saveCalendarData(updatedEvents);
-        console.log("✅ Event deleted and Firestore updated");
-      } catch (error) {
-        console.error("❌ Failed to save deleted event to Firestore:", error);
-        // Keep the state change but log the error
-      }
-    };
-    saveToFirestore();
-
-    // NEW: Clear colors for all dates that were part of this event
+    // Clear colors for all dates that were part of this event
     if (eventToRemove && eventToRemove.dateKeys) {
       const newColors = { ...dateColors };
-      // Remove color entries for all date keys of this event
       eventToRemove.dateKeys.forEach((dateKey) => {
         delete newColors[dateKey];
       });
-
-      // Update state
       setDateColors(newColors);
-
-      // Also save colors to Firestore
-      const saveColorsToFirestore = async () => {
-        try {
-          await saveCalendarDateColors(newColors);
-        } catch (error) {
-          console.error(
-            "❌ Failed to save updated colors to Firestore:",
-            error,
-          );
-        }
-      };
-      saveColorsToFirestore();
     }
 
-    // Close the warning modal and clear the event ID
     setDeleteWarningActive(false);
     setEventToDelete(null);
 
@@ -1901,7 +1542,6 @@ function Calendar() {
         (e) => e.dateKeys && e.dateKeys.includes(dateKey),
       );
 
-      // If no events remain for this date, close the event viewer
       if (remainingEvents.length === 0) {
         setEventViewerActive(false);
       }
@@ -1910,47 +1550,41 @@ function Calendar() {
     alert("Event deleted successfully!");
   }
 
-  function animateButtonClick(event) {
-    const button = event.currentTarget;
-
-    // Add animating class
-    button.classList.add("animating");
-
-    // Remove class after animation completes
-    setTimeout(() => {
-      button.classList.remove("animating");
-    }, 300);
-
-    // You can also add a sound effect if you want
-    // playClickSound();
-  }
-
-  // For the Year button:
   const handleYearButtonClick = () => {
     const today = new Date();
     const currentYear = today.getFullYear();
-
-    // Always switch to year view with current year
     setYearViewYear(currentYear);
     setCurrentView("year");
   };
 
-  // For the Month button:
   const handleMonthButtonClick = () => {
     const today = new Date();
     const targetMonth = today.getMonth();
     const targetYear = today.getFullYear();
-
-    // Always switch to month view with current month
     setCurrentMonth(targetMonth);
     setCurrentYear(targetYear);
     setCurrentView("month");
   };
 
-  // Usage - using currentMonth and currentYear state
-  const monthDates = getMonthDatesByWeekday(currentMonth, currentYear);
-  const wks = getWeeks();
+  // Show loading screen while data is being loaded
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          color: "white",
+          fontSize: "18px",
+        }}
+      >
+        <div>Loading calendar data...</div>
+      </div>
+    );
+  }
 
+  const wks = getWeeks();
   const date = new Date(currentYear, currentMonth);
   const formatted = date.toLocaleString("default", {
     month: "long",
@@ -1979,42 +1613,12 @@ function Calendar() {
         }}
         className="toggle-buttons-container"
       >
-        <button
-          className="month-year-nav-btn"
-          onClick={handleYearButtonClick}
-          // style={{
-          //   padding: "12px 24px",
-          //   backgroundColor: "#000033",
-          //   color: "white",
-          //   border: "none",
-          //   borderRadius: "8px",
-          //   fontSize: "16px",
-          //   fontWeight: "bold",
-          //   cursor: "pointer",
-          //   minWidth: "100px",
-          //   minHeight: "44px",
-          // }}
-        >
-          <span class="button_top"> Year </span>
+        <button className="month-year-nav-btn" onClick={handleYearButtonClick}>
+          <span className="button_top"> Year </span>
         </button>
 
-        <button
-          className="month-year-nav-btn"
-          onClick={handleMonthButtonClick}
-          // style={{
-          //   padding: "12px 24px",
-          //   backgroundColor: "#000033",
-          //   color: "white",
-          //   border: "none",
-          //   borderRadius: "8px",
-          //   fontSize: "16px",
-          //   fontWeight: "bold",
-          //   cursor: "pointer",
-          //   minWidth: "100px",
-          //   minHeight: "44px",
-          // }}
-        >
-          <span class="button_top"> Month </span>
+        <button className="month-year-nav-btn" onClick={handleMonthButtonClick}>
+          <span className="button_top"> Month </span>
         </button>
       </div>
 
@@ -2027,7 +1631,7 @@ function Calendar() {
             <div className="clndr-wrpr">
               <div className="month-name">
                 <button onClick={goToPrevMonth} className="prev-mnth-btn">
-                  <i class="fa-solid fa-angles-left"></i>
+                  <i className="fa-solid fa-angles-left"></i>
                 </button>
                 <h1
                   style={{
@@ -2039,7 +1643,7 @@ function Calendar() {
                 </h1>
 
                 <button onClick={goToNextMonth} className="nxt-mnth-btn">
-                  <i class="fa-solid fa-angles-right"></i>
+                  <i className="fa-solid fa-angles-right"></i>
                 </button>
               </div>
               <div
@@ -2068,7 +1672,6 @@ function Calendar() {
                     );
                   }
 
-                  // Get mood from separate moods array
                   const dateKey = `${todayYear}-${todayMonth + 1}-${todayDate}`;
                   const todayMood = moods.find((m) => m.dateKey === dateKey);
 
@@ -2105,7 +1708,7 @@ function Calendar() {
                               fontSize: "20px",
                               visibility: "hidden",
                               pointerEvents: "none",
-                              minWidth: "40px", // Match the width of actual dates
+                              minWidth: "40px",
                               textAlign: "center",
                               display: "inline-block",
                             }}
@@ -2157,7 +1760,6 @@ function Calendar() {
                           }
                         >
                           {date}
-                          {/* Add a visual indicator for events that span months */}
                           {connectionClass === "last-day-connected" && (
                             <span
                               style={{
@@ -2189,7 +1791,7 @@ function Calendar() {
               onEventEdit={handleEditEvent}
               reminders={reminders}
             />
-            {/* Pass handleSaveEvent to EventEditor */}
+
             {showEventEditor && (
               <EventEditor
                 onClose={() => {
@@ -2201,7 +1803,6 @@ function Calendar() {
               />
             )}
 
-            {/* Delete Confirmation Warning Modal */}
             {deleteWarningActive && (
               <>
                 <div className="backdrop" onClick={cancelDelete}></div>
