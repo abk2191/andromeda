@@ -342,7 +342,7 @@ html.dark-theme {
 /* FIXED: Perfectly centered title */
 .page-text {
   padding: 8px 16px;
-  font-size: 23px;
+  font-size: 32px;
   height: 64px;
   display: flex;
   align-items: center;
@@ -359,8 +359,10 @@ html.dark-theme {
   font-weight: 500;
   letter-spacing: -0.5px;
   font-family: "Inter", sans-serif;
-
-  color: #000033;
+  text-shadow:
+    0 0 10px #32327a,
+    0 0 20px rgba(255, 255, 255, 0.5);
+  color: #32327a;
   font-weight: bold;
   transition:
     color 0.3s ease,
@@ -555,7 +557,7 @@ html.dark-theme {
   font-weight: 500;
   letter-spacing: -0.5px;
   font-family: "Inter", sans-serif;
-  color: #000033;
+  color: #32327a;
   font-size: 30px;
   font-weight: bold;
   transition: color 0.3s ease;
@@ -1570,11 +1572,11 @@ html {
   width: 500px;
   flex-direction: column;
   margin-top: 35px;
-
-  background-color: transparent;
-  border: 1px solid rgb(224, 224, 224);
+  border: 1px solid #32327a;
+  background-color: #32327a;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   padding: 40px;
-
+  border-radius: 10px;
   transition: background-color 0.3s ease;
 }
 
@@ -1865,8 +1867,8 @@ html {
 }
 
 .day-names-div p {
-  color: black;
-  font-size: 15px;
+  color: white;
+  font-weight: bold;
   transition: color 0.3s ease;
 }
 
@@ -1888,10 +1890,6 @@ html {
   margin-bottom: 25px;
 }
 
-.month-name i {
-  color: black;
-}
-
 .mood-select {
   height: 30px;
   width: 100%;
@@ -1900,10 +1898,10 @@ html {
   justify-content: center;
   text-align: center;
   margin-bottom: 3px;
-  /* color: greenyellow;
+  color: greenyellow;
   text-shadow:
     0 0 10px greenyellow,
-    0 0 20px rgba(255, 255, 255, 0.5); */
+    0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .mood-display {
@@ -1997,11 +1995,13 @@ html {
 
 .clock {
   font-family: "Inter", sans-serif;
-  color: #000033;
+  color: #32327a;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 25px;
   margin-top: 30px;
-
+  text-shadow:
+    0 0 10px #32327a,
+    0 0 20px rgba(255, 255, 255, 0.5);
   transition:
     color 0.3s ease,
     text-shadow 0.3s ease;
@@ -2441,142 +2441,6 @@ html {
   background-color: rgb(38, 134, 38);
 }
 
-/* From Uiverse.io by andrew-demchenk0 */
-.new-note-button {
-  position: relative;
-  width: 150px;
-  height: 40px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  border: 1px solid #34974d;
-  background-color: #3aa856;
-  font-family: "Inter", sans-serif;
-}
-
-.new-note-button,
-.button__icon,
-.button__text {
-  transition: all 0.3s;
-}
-
-.new-note-button .button__text {
-  transform: translateX(30px);
-  color: #fff;
-  font-weight: 600;
-}
-
-.new-note-button .button__icon {
-  position: absolute;
-  transform: translateX(109px);
-  height: 100%;
-  width: 39px;
-  background-color: #34974d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.new-note-button .svg {
-  width: 30px;
-  stroke: #fff;
-}
-
-.new-note-button:hover {
-  background: #34974d;
-}
-
-.new-note-button:hover .button__text {
-  color: transparent;
-}
-
-.new-note-button:hover .button__icon {
-  width: 148px;
-  transform: translateX(0);
-}
-
-.new-note-button:active .button__icon {
-  background-color: #2e8644;
-}
-
-.new-note-button:active {
-  border: 1px solid #2e8644;
-}
-
-/* From Uiverse.io by Voxybuns */
-.calendar_button {
-  /* Variables */
-  --button_radius: 0.75em;
-  --button_color: #e8e8e8;
-  --button_outline_color: #4a4a4a;
-  font-size: 17px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--button_radius);
-  background: var(--button_outline_color);
-}
-
-/* From Uiverse.io by Voxybuns */
-.calendar_button {
-  /* Variables */
-  --button_radius: 0.75em;
-  --button_color: #e8e8e8;
-  --button_outline_color: #4a4a4a;
-  font-size: 17px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--button_radius);
-  background: var(--button_outline_color);
-}
-
-.calendar_button_top {
-  display: block;
-  box-sizing: border-box;
-  border: 2px solid var(--button_outline_color);
-  border-radius: var(--button_radius);
-  padding: 0.75em 1.5em;
-  background: var(--button_color);
-  color: var(--button_outline_color);
-  transform: translateY(-0.2em);
-  transition: transform 0.1s ease;
-}
-
-/* .calendar_button:hover .calendar_button_top {
-  
-  transform: translateY(-0.33em);
-} */
-
-.calendar_button:active .calendar_button_top {
-  /* Push the button downwards when pressed */
-  transform: translateY(0);
-}
-
-.calendar-action-button {
-  height: 35px;
-  width: 100px;
-  font-family: "Inter", sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  background: none;
-  border: 1px solid #000033;
-  color: #000033;
-}
-
-.action-buttons {
-  height: 35px;
-  width: 100px;
-  font-family: "Inter", sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  background: none;
-  border: 1px solid #000033;
-  color: #000033;
-}
-
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,
@@ -2636,7 +2500,7 @@ html {
   }
 
   .day-names-div {
-    gap: 29px;
+    gap: 27px;
     margin-top: 15px;
   }
 
@@ -2683,7 +2547,7 @@ html {
   }
 
   .page-text {
-    font-size: 10px;
+    font-size: 24px;
     height: 48px;
   }
 
@@ -2800,7 +2664,7 @@ html {
   }
 
   .page-text {
-    font-size: 10px;
+    font-size: 22px;
     padding: 8px 12px;
   }
 
@@ -2901,7 +2765,7 @@ html,
 
 /* Light theme body background */
 body {
-  background-color: white;
+  background-color: whitesmoke;
   font-family: "Inter", sans-serif;
   transition: background-color 0.3s ease;
 }

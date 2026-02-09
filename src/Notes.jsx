@@ -661,11 +661,8 @@ function Notes() {
                   className="pushable-container"
                   style={{ marginBottom: "30px" }}
                 >
-                  {/* <button className="add-new-note-button" onClick={newNote}>
+                  <button className="add-new-note-button" onClick={newNote}>
                     <span className="button_top"> ADD NOTE </span>
-                  </button> */}
-                  <button className="action-buttons" onClick={newNote}>
-                    Add Note +
                   </button>
                 </div>
 
@@ -820,7 +817,7 @@ function Notes() {
                     {/* ALL NOTES HEADER - Always show this, even if there are no pinned notes */}
                     <div className="wrapper">
                       <div className="page-text-2">
-                        <h2>ALL NOTES ({sortedUnpinnedNotes.length})</h2>
+                        <h2>ALL NOTES</h2>
                       </div>
                     </div>
                   </div>

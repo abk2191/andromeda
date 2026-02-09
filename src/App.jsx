@@ -309,7 +309,7 @@ function App() {
                 >
                   <div className="sidebar-menu-items">
                     <i className="fa-solid fa-list-check"></i>
-                    <h2 style={{ fontSize: "18px" }}>LISTS</h2>
+                    <h2 style={{ fontSize: "18px" }}>TODOS</h2>
                   </div>
                 </div>
 
