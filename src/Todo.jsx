@@ -992,8 +992,33 @@ function Todo() {
                   className="pushable-container"
                   style={{ marginBottom: "30px" }}
                 >
-                  <button className="add-new-note-button" onClick={newTodo}>
+                  {/* <button className="add-new-note-button" onClick={newTodo}>
                     <span className="button_top"> ADD TODO </span>
+                  </button> */}
+
+                  <button
+                    type="button"
+                    class="new-note-button"
+                    onClick={newTodo}
+                  >
+                    <span class="button__text">Add Todo</span>
+                    <span class="button__icon">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke="currentColor"
+                        height="24"
+                        fill="none"
+                        class="svg"
+                      >
+                        <line y2="19" y1="5" x2="12" x1="12"></line>
+                        <line y2="12" y1="12" x2="19" x1="5"></line>
+                      </svg>
+                    </span>
                   </button>
                 </div>
 
@@ -1170,7 +1195,7 @@ function Todo() {
                     {/* ALL TODOS HEADER - Always show this, even if there are no pinned todos */}
                     <div className="wrapper">
                       <div className="page-text-2">
-                        <h2>ALL LISTS</h2>
+                        <h2>ALL LISTS ({sortedUnpinnedTodos.length})</h2>
                       </div>
                     </div>
                   </div>
