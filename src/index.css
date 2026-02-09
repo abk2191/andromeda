@@ -2881,7 +2881,7 @@ html,
 
 /* Light theme body background */
 body {
-  background-color: whitesmoke;
+  background-color: white;
   font-family: "Inter", sans-serif;
   transition: background-color 0.3s ease;
 }
