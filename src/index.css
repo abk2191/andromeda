@@ -359,10 +359,8 @@ html.dark-theme {
   font-weight: 500;
   letter-spacing: -0.5px;
   font-family: "Inter", sans-serif;
-  text-shadow:
-    0 0 10px #32327a,
-    0 0 20px rgba(255, 255, 255, 0.5);
-  color: #32327a;
+
+  color: #000033;
   font-weight: bold;
   transition:
     color 0.3s ease,
@@ -557,7 +555,7 @@ html.dark-theme {
   font-weight: 500;
   letter-spacing: -0.5px;
   font-family: "Inter", sans-serif;
-  color: #32327a;
+  color: #000033;
   font-size: 30px;
   font-weight: bold;
   transition: color 0.3s ease;
