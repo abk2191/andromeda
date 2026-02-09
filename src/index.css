@@ -1862,8 +1862,8 @@ html {
 .day-names-div {
   display: flex;
   width: 500px;
-  gap: 45px;
-  margin-left: 6px;
+  gap: 43px;
+  margin-left: 2px;
 }
 
 .day-names-div p {
@@ -2638,7 +2638,7 @@ html {
   }
 
   .day-names-div {
-    gap: 27px;
+    gap: 29px;
     margin-top: 15px;
   }
 
