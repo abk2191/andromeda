@@ -2568,10 +2568,6 @@ html {
   border: none;
 }
 
-.calendar-action-button:focus {
-  color: yellow;
-}
-
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .event-desc,

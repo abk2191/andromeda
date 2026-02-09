@@ -1590,7 +1590,7 @@ function Calendar() {
                       //     : "#000033"
                       //   : "transparent",
                       color: isToday ? "red" : hasEvent ? "green" : "black",
-                      textShadow: isToday ? "0 0 3px red" : "none",
+                      // textShadow: isToday ? "0 0 3px red" : "none",
                       borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
