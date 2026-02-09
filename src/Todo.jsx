@@ -890,7 +890,7 @@ function Todo() {
       <div className="main-kontainer">
         <div className="wrapper">
           <div className="page-text">
-            <h1>LIST</h1>
+            <h1>LISTS</h1>
           </div>
         </div>
 
