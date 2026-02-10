@@ -1572,9 +1572,9 @@ html {
   width: 500px;
   flex-direction: column;
   margin-top: 35px;
-  border: 1px solid #32327a;
+  border: 1px solid rgb(202, 201, 201);
   background-color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
   padding: 40px;
 
   transition: background-color 0.3s ease;
@@ -2765,7 +2765,7 @@ html,
 
 /* Light theme body background */
 body {
-  background-color: whitesmoke;
+  background-color: white;
   font-family: "Inter", sans-serif;
   transition: background-color 0.3s ease;
 }
