@@ -1206,9 +1206,8 @@ function Calendar() {
             className="month-title"
             style={{
               margin: 0,
-              fontSize: "16px",
-              color: "white",
-              fontWeight: "bold",
+              fontSize: "14px",
+              color: isDarkTheme ? "white" : "#000033",
             }}
           >
             {monthName.substring(0, 3)}
@@ -1230,8 +1229,8 @@ function Calendar() {
               style={{
                 fontSize: "12px",
                 textAlign: "center",
-                color: "white",
-                fontWeight: "bold",
+                color: isDarkTheme ? "white" : "#000033",
+
                 flex: "1",
                 minWidth: "0",
               }}
