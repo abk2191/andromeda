@@ -1284,6 +1284,10 @@ function Calendar() {
                   (item) => item.dateKeys && item.dateKeys.includes(dateKey),
                 );
 
+                // Check if this is a Sunday
+                const dateObj = new Date(year, monthData.monthNumber, date);
+                const isSunday = dateObj.getDay() === 0;
+
                 return (
                   <span
                     key={dateIndex}
@@ -1300,12 +1304,14 @@ function Calendar() {
                       //     : "#000033"
                       //   : "transparent",
                       color: isToday
-                        ? "red"
+                        ? "gold"
                         : hasEvent
                           ? "green"
-                          : isDarkTheme
-                            ? "white"
-                            : "#000033",
+                          : isSunday
+                            ? "red"
+                            : isDarkTheme
+                              ? "white"
+                              : "#000033",
                       // textShadow: isToday ? "0 0 3px red" : "none",
                       borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
@@ -1769,6 +1775,10 @@ function Calendar() {
                         };
                       }
 
+                      // Check if this is a Sunday
+                      const dateObj = new Date(currentYear, currentMonth, date);
+                      const isSunday = dateObj.getDay() === 0;
+
                       return (
                         <span
                           key={dateIndex}
@@ -1778,12 +1788,14 @@ function Calendar() {
                           style={{
                             color:
                               date === todayDate
-                                ? "red" // Today always red
+                                ? "gold" // Today - blue
                                 : hasEvent
-                                  ? "green" // Events always gold
-                                  : isDarkTheme
-                                    ? "white" // Dark theme: white text
-                                    : "#000033", // Light theme: dark blue text
+                                  ? "green" // Events - green
+                                  : isSunday
+                                    ? "red" // Sundays - red
+                                    : isDarkTheme
+                                      ? "white" // Dark theme: white text
+                                      : "#000033", // Light theme: dark blue text
                             // textShadow:
                             //   date === todayDate
                             //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
