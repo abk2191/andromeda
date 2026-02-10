@@ -465,15 +465,15 @@ html.dark-theme {
 .dark-theme .year-header h2,
 .dark-theme .year-header button {
   color: white !important;
-  text-shadow:
+  /* text-shadow:
     0 0 10px white,
-    0 0 20px rgba(255, 255, 255, 0.5) !important;
+    0 0 20px rgba(255, 255, 255, 0.5) !important; */
 }
 
 /* Dark theme for month cards in year view */
-.dark-theme .month-date.has-event {
+/* .dark-theme .month-date.has-event {
   background-color: #32327a !important;
-}
+} */
 
 /* Ensure text colors are correct in dark theme */
 .dark-theme .month-title {
@@ -1582,7 +1582,8 @@ html {
 
 /* Dark theme styles for clndr-wrpr */
 .dark-theme .clndr-wrpr {
-  background-color: #000033 !important;
+  background-color: black !important;
+  border: 1px solid #1a1a1a;
 }
 
 .event-viewer-name {
@@ -2008,9 +2009,9 @@ html {
 /* Dark theme styles for clock */
 .dark-theme .clock {
   color: white !important;
-  text-shadow:
+  /* text-shadow:
     0 0 10px white,
-    0 0 20px rgba(255, 255, 255, 0.5) !important;
+    0 0 20px rgba(255, 255, 255, 0.5) !important; */
 }
 
 .theme-holder-main {
@@ -2449,6 +2450,20 @@ html {
   font-family: "Inter", sans-serif;
   cursor: pointer;
 }
+
+.dark-theme .new-action-button {
+  border: 1px solid white;
+  background-color: #1a1a1a;
+  color: white;
+}
+
+/* .dark-theme .month-card {
+  border: 1px solid #1a1a1a;
+} */
+
+/* .dark-theme .month-date {
+  color: white;
+} */
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {

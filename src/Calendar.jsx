@@ -1161,7 +1161,9 @@ function Calendar() {
                         className="month-card"
                         style={{
                           backgroundColor: isDarkTheme ? "black" : "white",
-                          border: "1px solid rgb(202, 201, 201)",
+                          border: isDarkTheme
+                            ? "1px solid #1a1a1a"
+                            : "1px solid rgb(202, 201, 201)",
 
                           padding: startIndex === 0 ? "5px" : "10px",
 
@@ -1204,14 +1206,16 @@ function Calendar() {
             className="month-title"
             style={{
               margin: 0,
-              fontSize: "13px",
-              color: "#000033",
+              fontSize: "16px",
+              color: "white",
+              fontWeight: "bold",
             }}
           >
             {monthName.substring(0, 3)}
           </h3>
         </div>
 
+        {/* Day headers */}
         <div
           className="month-day-headers"
           style={{
@@ -1226,8 +1230,8 @@ function Calendar() {
               style={{
                 fontSize: "12px",
                 textAlign: "center",
-                color: "#000033",
-                // fontWeight: "bold",
+                color: "white",
+                fontWeight: "bold",
                 flex: "1",
                 minWidth: "0",
               }}
@@ -1237,6 +1241,7 @@ function Calendar() {
           ))}
         </div>
 
+        {/* Calendar weeks - using flexbox */}
         <div className="month-weeks">
           {weeks.map((week, weekIndex) => (
             <div
@@ -1248,6 +1253,7 @@ function Calendar() {
               }}
             >
               {week.map((date, dateIndex) => {
+                // Empty cell
                 if (date === " ") {
                   return (
                     <span
@@ -1266,12 +1272,14 @@ function Calendar() {
                   );
                 }
 
+                // Check if this is today
                 const today = new Date();
                 const isToday =
                   year === today.getFullYear() &&
                   monthData.monthNumber === today.getMonth() &&
                   date === today.getDate();
 
+                // Check if has event
                 const dateKey = `${year}-${monthData.monthNumber + 1}-${date}`;
                 const hasEvent = event.some(
                   (item) => item.dateKeys && item.dateKeys.includes(dateKey),
@@ -1292,17 +1300,24 @@ function Calendar() {
                       //     ? "#32327a"
                       //     : "#000033"
                       //   : "transparent",
-                      color: isToday ? "red" : hasEvent ? "gold" : "#000033",
-                      // textShadow: isToday ? "0 0 3px red" : "none",
-                      // borderRadius: hasEvent ? "3px" : "0",
+                      color: isToday
+                        ? "red"
+                        : hasEvent
+                          ? "gold"
+                          : isDarkTheme
+                            ? "white"
+                            : "#000033",
+                      textShadow: isToday ? "0 0 3px red" : "none",
+                      borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
-                      // border: hasEvent ? "1px solid white" : "none",
+
                       flex: "1",
                       minWidth: "0",
                     }}
                     onClick={() => {
                       if (hasEvent) {
+                        // Switch to month view and select this date
                         setCurrentMonth(monthData.monthNumber);
                         setCurrentYear(year);
                         setSelectedDate(date);
@@ -1633,12 +1648,15 @@ function Calendar() {
                 <button onClick={goToPrevMonth} className="prev-mnth-btn">
                   <i
                     className="fa-solid fa-angles-left"
-                    style={{ color: "#000033", fontSize: "20px" }}
+                    style={{
+                      color: isDarkTheme ? "white" : "#000033",
+                      fontSize: "20px",
+                    }}
                   ></i>
                 </button>
                 <h1
                   style={{
-                    color: "#000033",
+                    color: isDarkTheme ? "white" : "#000033",
                     fontSize: "20px",
                   }}
                 >
@@ -1648,7 +1666,10 @@ function Calendar() {
                 <button onClick={goToNextMonth} className="nxt-mnth-btn">
                   <i
                     className="fa-solid fa-angles-right"
-                    style={{ color: "#000033", fontSize: "20px" }}
+                    style={{
+                      color: isDarkTheme ? "white" : "#000033",
+                      fontSize: "20px",
+                    }}
                   ></i>
                 </button>
               </div>
@@ -1657,7 +1678,7 @@ function Calendar() {
                 onClick={handleMood}
                 style={{
                   fontSize: "15px",
-                  color: "#000033",
+                  color: isDarkTheme ? "white" : "#000033",
                   marginBottom: "12px",
                 }}
               >
@@ -1747,10 +1768,12 @@ function Calendar() {
                           style={{
                             color:
                               date === todayDate
-                                ? "red"
+                                ? "red" // Today always red
                                 : hasEvent
-                                  ? "gold"
-                                  : "#000033",
+                                  ? "gold" // Events always gold
+                                  : isDarkTheme
+                                    ? "white" // Dark theme: white text
+                                    : "#000033", // Light theme: dark blue text
                             // textShadow:
                             //   date === todayDate
                             //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
