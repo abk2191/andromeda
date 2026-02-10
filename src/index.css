@@ -1995,13 +1995,11 @@ html {
 
 .clock {
   font-family: "Inter", sans-serif;
-  color: #32327a;
+  color: #000033;
   font-weight: bold;
-  font-size: 25px;
+  font-size: 20px;
   margin-top: 30px;
-  text-shadow:
-    0 0 10px #32327a,
-    0 0 20px rgba(255, 255, 255, 0.5);
+
   transition:
     color 0.3s ease,
     text-shadow 0.3s ease;
@@ -2439,6 +2437,17 @@ html {
   border-radius: 50%;
   border: 4px solid white;
   background-color: rgb(38, 134, 38);
+}
+
+.new-action-button {
+  color: #000033;
+  font-size: 15px;
+  height: 40px;
+  width: 120px;
+  border: 1px solid #000033;
+  background-color: white;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */

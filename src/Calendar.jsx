@@ -1080,12 +1080,12 @@ function Calendar() {
               style={{
                 background: "none",
                 border: "none",
-                color: isDarkTheme ? "white" : "#32327a",
-                fontSize: "40px",
+                color: isDarkTheme ? "white" : "#000033",
+                fontSize: "22px",
                 cursor: "pointer",
-                textShadow: isDarkTheme
-                  ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                  : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
+                // textShadow: isDarkTheme
+                //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
+                //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
               title="Previous Year"
             >
@@ -1101,12 +1101,12 @@ function Calendar() {
             >
               <h2
                 style={{
-                  fontSize: "28px",
+                  fontSize: "22px",
                   margin: 0,
-                  color: isDarkTheme ? "white" : "#32327a",
-                  textShadow: isDarkTheme
-                    ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                    : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
+                  color: isDarkTheme ? "white" : "#000033",
+                  // textShadow: isDarkTheme
+                  //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
+                  //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
                 }}
               >
                 {year}
@@ -1118,12 +1118,12 @@ function Calendar() {
               style={{
                 background: "none",
                 border: "none",
-                color: isDarkTheme ? "white" : "#32327a",
-                fontSize: "40px",
+                color: isDarkTheme ? "white" : "#000033",
+                fontSize: "22px",
                 cursor: "pointer",
-                textShadow: isDarkTheme
-                  ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                  : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
+                // textShadow: isDarkTheme
+                //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
+                //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
             >
               <i className="fa-solid fa-angles-right"></i>
@@ -1293,7 +1293,7 @@ function Calendar() {
                       //     : "#000033"
                       //   : "transparent",
                       color: isToday ? "red" : hasEvent ? "gold" : "#000033",
-                      textShadow: isToday ? "0 0 3px red" : "none",
+                      // textShadow: isToday ? "0 0 3px red" : "none",
                       // borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
@@ -1613,12 +1613,12 @@ function Calendar() {
         }}
         className="toggle-buttons-container"
       >
-        <button className="month-year-nav-btn" onClick={handleYearButtonClick}>
-          <span className="button_top"> Year </span>
+        <button className="new-action-button" onClick={handleYearButtonClick}>
+          Year View
         </button>
 
-        <button className="month-year-nav-btn" onClick={handleMonthButtonClick}>
-          <span className="button_top"> Month </span>
+        <button className="new-action-button" onClick={handleMonthButtonClick}>
+          Month View
         </button>
       </div>
 
