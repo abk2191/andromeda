@@ -1302,11 +1302,11 @@ function Calendar() {
                       color: isToday
                         ? "red"
                         : hasEvent
-                          ? "gold"
+                          ? "green"
                           : isDarkTheme
                             ? "white"
                             : "#000033",
-                      textShadow: isToday ? "0 0 3px red" : "none",
+                      // textShadow: isToday ? "0 0 3px red" : "none",
                       borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
@@ -1753,7 +1753,7 @@ function Calendar() {
                       let borderStyle = {};
                       if (hasEvent) {
                         borderStyle = {
-                          border: "2px solid white",
+                          // border: "2px solid white",
                           borderRadius: "8px",
                         };
                       }
@@ -1769,7 +1769,7 @@ function Calendar() {
                               date === todayDate
                                 ? "red" // Today always red
                                 : hasEvent
-                                  ? "gold" // Events always gold
+                                  ? "green" // Events always gold
                                   : isDarkTheme
                                     ? "white" // Dark theme: white text
                                     : "#000033", // Light theme: dark blue text
