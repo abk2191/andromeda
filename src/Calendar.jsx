@@ -1206,7 +1206,7 @@ function Calendar() {
             className="month-title"
             style={{
               margin: 0,
-              fontSize: "14px",
+              fontSize: "11px",
               color: isDarkTheme ? "white" : "#000033",
             }}
           >
