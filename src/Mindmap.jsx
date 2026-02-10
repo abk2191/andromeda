@@ -318,7 +318,7 @@ export default function Mindmap({ lightTheme }) {
             }}
           >
             {" "}
-            MINDMAP
+            <i className="fa-solid fa-brain"></i>&nbsp;MINDMAP
           </h1>
 
           <button className="new-action-button" onClick={startNewMap}>

@@ -582,7 +582,9 @@ function Notes() {
       <div className="main-kontainer">
         <div className="wrapper">
           <div className="page-text">
-            <h1>NOTES</h1>
+            <h1>
+              <i className="fa-solid fa-lightbulb"></i>&nbsp;NOTES
+            </h1>
           </div>
         </div>
 

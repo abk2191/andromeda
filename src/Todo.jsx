@@ -890,7 +890,9 @@ function Todo() {
       <div className="main-kontainer">
         <div className="wrapper">
           <div className="page-text">
-            <h1>LISTS</h1>
+            <h1>
+              <i className="fa-solid fa-list-check"></i>&nbsp;LISTS
+            </h1>
           </div>
         </div>
 

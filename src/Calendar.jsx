@@ -1621,7 +1621,7 @@ function Calendar() {
               fontSize: "25px",
             }}
           >
-            CALENDAR
+            <i className="fa-solid fa-calendar-days"></i>&nbsp;CALENDAR
           </h1>
         </div>
         <LiveClock />
