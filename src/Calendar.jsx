@@ -1202,7 +1202,7 @@ function Calendar() {
             marginBottom: "10px",
           }}
         >
-          <h3
+          <p
             className="month-title"
             style={{
               margin: 0,
@@ -1211,7 +1211,7 @@ function Calendar() {
             }}
           >
             {monthName.substring(0, 3)}
-          </h3>
+          </p>
         </div>
 
         {/* Day headers */}
