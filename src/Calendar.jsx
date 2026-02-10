@@ -1653,14 +1653,14 @@ function Calendar() {
                     }}
                   ></i>
                 </button>
-                <h1
+                <p
                   style={{
                     color: isDarkTheme ? "white" : "#000033",
                     fontSize: "20px",
                   }}
                 >
                   {formatted}
-                </h1>
+                </p>
 
                 <button onClick={goToNextMonth} className="nxt-mnth-btn">
                   <i
