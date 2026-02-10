@@ -431,7 +431,7 @@ const styles = {
   },
   node: {
     padding: "8px 14px",
-    borderRadius: 12,
+    borderRadius: 0,
     color: "#fff",
     display: "inline-block",
   },
