@@ -458,9 +458,9 @@ html.dark-theme {
 }
 
 /* Dark theme for year view */
-.dark-theme .month-card {
+/* .dark-theme .month-card {
   background-color: #000033 !important;
-}
+} */
 
 .dark-theme .year-header h2,
 .dark-theme .year-header button {

@@ -1160,10 +1160,11 @@ function Calendar() {
                         key={monthName}
                         className="month-card"
                         style={{
-                          backgroundColor: isDarkTheme ? "#000033" : "#32327a",
-                          borderRadius: "10px",
+                          backgroundColor: isDarkTheme ? "black" : "white",
+                          border: "1px solid rgb(202, 201, 201)",
+
                           padding: startIndex === 0 ? "5px" : "10px",
-                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+
                           cursor: "pointer",
                         }}
                         onClick={() => handleMonthCardClick(monthName)}
@@ -1203,9 +1204,8 @@ function Calendar() {
             className="month-title"
             style={{
               margin: 0,
-              fontSize: "16px",
-              color: "white",
-              fontWeight: "bold",
+              fontSize: "13px",
+              color: "#000033",
             }}
           >
             {monthName.substring(0, 3)}
@@ -1226,8 +1226,8 @@ function Calendar() {
               style={{
                 fontSize: "12px",
                 textAlign: "center",
-                color: "white",
-                fontWeight: "bold",
+                color: "#000033",
+                // fontWeight: "bold",
                 flex: "1",
                 minWidth: "0",
               }}
@@ -1287,17 +1287,17 @@ function Calendar() {
                       fontSize: "12px",
                       textAlign: "center",
                       padding: "2px 0",
-                      backgroundColor: hasEvent
-                        ? isDarkTheme
-                          ? "#32327a"
-                          : "#000033"
-                        : "transparent",
-                      color: isToday ? "red" : hasEvent ? "white" : "white",
+                      // backgroundColor: hasEvent
+                      //   ? isDarkTheme
+                      //     ? "#32327a"
+                      //     : "#000033"
+                      //   : "transparent",
+                      color: isToday ? "red" : hasEvent ? "gold" : "#000033",
                       textShadow: isToday ? "0 0 3px red" : "none",
-                      borderRadius: hasEvent ? "3px" : "0",
+                      // borderRadius: hasEvent ? "3px" : "0",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
-                      border: hasEvent ? "1px solid white" : "none",
+                      // border: hasEvent ? "1px solid white" : "none",
                       flex: "1",
                       minWidth: "0",
                     }}
@@ -1745,14 +1745,20 @@ function Calendar() {
                             hasEvent ? "has-event" : ""
                           }`}
                           style={{
-                            color: date === todayDate ? "red" : "#000033",
+                            color:
+                              date === todayDate
+                                ? "red"
+                                : hasEvent
+                                  ? "gold"
+                                  : "#000033",
                             // textShadow:
                             //   date === todayDate
                             //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
                             //     : "none",
 
                             fontSize: "20px",
-                            backgroundColor: getEventColorForDate(date),
+                            // backgroundColor: getEventColorForDate(date),
+
                             cursor: "pointer",
                             ...borderStyle,
                             padding: "2px 8px",
