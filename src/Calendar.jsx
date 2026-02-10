@@ -1631,19 +1631,25 @@ function Calendar() {
             <div className="clndr-wrpr">
               <div className="month-name">
                 <button onClick={goToPrevMonth} className="prev-mnth-btn">
-                  <i className="fa-solid fa-angles-left"></i>
+                  <i
+                    className="fa-solid fa-angles-left"
+                    style={{ color: "#000033", fontSize: "20px" }}
+                  ></i>
                 </button>
                 <h1
                   style={{
-                    color: "white",
-                    fontSize: "22px",
+                    color: "#000033",
+                    fontSize: "20px",
                   }}
                 >
                   {formatted}
                 </h1>
 
                 <button onClick={goToNextMonth} className="nxt-mnth-btn">
-                  <i className="fa-solid fa-angles-right"></i>
+                  <i
+                    className="fa-solid fa-angles-right"
+                    style={{ color: "#000033", fontSize: "20px" }}
+                  ></i>
                 </button>
               </div>
               <div
@@ -1651,7 +1657,7 @@ function Calendar() {
                 onClick={handleMood}
                 style={{
                   fontSize: "15px",
-                  color: "greenyellow",
+                  color: "#000033",
                   marginBottom: "12px",
                 }}
               >
@@ -1739,12 +1745,12 @@ function Calendar() {
                             hasEvent ? "has-event" : ""
                           }`}
                           style={{
-                            color: date === todayDate ? "red" : "inherit",
-                            textShadow:
-                              date === todayDate
-                                ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
-                                : "none",
-                            fontWeight: "bold",
+                            color: date === todayDate ? "red" : "#000033",
+                            // textShadow:
+                            //   date === todayDate
+                            //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
+                            //     : "none",
+
                             fontSize: "20px",
                             backgroundColor: getEventColorForDate(date),
                             cursor: "pointer",
