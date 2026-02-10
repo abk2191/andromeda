@@ -1589,7 +1589,7 @@ function Calendar() {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
-          color: "white",
+          color: isDarkTheme ? "white" : "#000033",
           fontSize: "18px",
         }}
       >
@@ -1613,6 +1613,16 @@ function Calendar() {
   return (
     <>
       <div className="time" style={{ marginTop: "70px" }}>
+        <div>
+          <h1
+            style={{
+              color: isDarkTheme ? "white" : "#000033",
+              fontFamily: '"Inter", sans-serif',
+            }}
+          >
+            Calendar
+          </h1>
+        </div>
         <LiveClock />
       </div>
 

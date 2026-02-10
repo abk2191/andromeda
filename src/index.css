@@ -2236,6 +2236,7 @@ html {
 
 .time {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
@@ -2579,7 +2580,7 @@ html {
   }
 
   .page-text {
-    font-size: 18px;
+    font-size: 13px;
     height: 48px;
   }
 
@@ -2696,7 +2697,7 @@ html {
   }
 
   .page-text {
-    font-size: 18px;
+    font-size: 13px;
     padding: 8px 12px;
   }
 

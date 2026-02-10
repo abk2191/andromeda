@@ -310,9 +310,9 @@ export default function Mindmap({ lightTheme }) {
           <h1
             style={{
               color: isDarkTheme ? "white" : "#000033", // Added
-              textShadow: isDarkTheme
-                ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                : "0 0 10px #000033, 0 0 20px rgba(255, 255, 255, 0.5)", // Added
+              // textShadow: isDarkTheme
+              //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
+              //   : "0 0 10px #000033, 0 0 20px rgba(255, 255, 255, 0.5)", // Added
               fontSize: "45px",
               marginBottom: "15px",
             }}
@@ -321,8 +321,8 @@ export default function Mindmap({ lightTheme }) {
             <i class="fa-solid fa-brain"></i> Mindmap
           </h1>
 
-          <button className="add-new-note-button" onClick={startNewMap}>
-            <span class="button_top"> ADD MAP</span>
+          <button className="new-action-button" onClick={startNewMap}>
+            ADD MAP &nbsp;<i class="fa-solid fa-plus"></i>
           </button>
         </div>
 
@@ -330,7 +330,21 @@ export default function Mindmap({ lightTheme }) {
           {maps.map((map) => (
             <div
               key={map.id}
-              style={styles.mapCard}
+              style={{
+                padding: "32px",
+                background: "transparent",
+                cursor: "pointer",
+                marginBottom: "8px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                color: isDarkTheme ? "white" : "#000033",
+                height: "80px",
+                fontSize: "25px",
+                borderBottom: isDarkTheme
+                  ? "1px solid #1a1a1a"
+                  : "1px solid rgb(202, 201, 201)",
+              }}
               onClick={() => {
                 setActiveMap(JSON.parse(JSON.stringify(map)));
                 setMode("editing");
@@ -339,7 +353,13 @@ export default function Mindmap({ lightTheme }) {
               <span>{map.nodes[0]?.text || "Untitled"}</span>
 
               <button
-                style={styles.deleteBtn}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  color: isDarkTheme ? "white" : "#000033", // Changed this line
+                  cursor: "pointer",
+                  fontSize: "20px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   deleteMap(map.id);
@@ -359,8 +379,8 @@ export default function Mindmap({ lightTheme }) {
   return (
     <div style={styles.container}>
       <div className="in-center">
-        <button className="add-new-note-button" onClick={saveMap}>
-          <span class="button_top"> SAVE MAP</span>
+        <button className="new-action-button" onClick={saveMap}>
+          SAVE MAP
         </button>
 
         <div style={styles.zoom}>
@@ -431,16 +451,17 @@ const styles = {
   },
   mapCard: {
     padding: 32,
-    background: "#000033",
-    borderRadius: 8,
+    background: "transparent",
+
     cursor: "pointer",
     marginBottom: 8,
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    color: "white",
+    color: "#000033",
     height: "80px",
     fontSize: "25px",
+    borderBottom: "1px solid #000033",
   },
   deleteBtn: {
     border: "none",
