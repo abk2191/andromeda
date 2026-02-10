@@ -1163,7 +1163,7 @@ function Calendar() {
                           backgroundColor: isDarkTheme ? "black" : "white",
                           border: isDarkTheme
                             ? "1px solid #1a1a1a"
-                            : "1px solid rgb(239, 239, 239)",
+                            : "1px solid rgb(242, 242, 242)",
 
                           padding: startIndex === 0 ? "5px" : "10px",
 
