@@ -1618,9 +1618,10 @@ function Calendar() {
             style={{
               color: isDarkTheme ? "white" : "#000033",
               fontFamily: '"Inter", sans-serif',
+              fontSize: "25px",
             }}
           >
-            Calendar
+            CALENDAR
           </h1>
         </div>
         <LiveClock />

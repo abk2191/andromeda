@@ -313,12 +313,12 @@ export default function Mindmap({ lightTheme }) {
               // textShadow: isDarkTheme
               //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
               //   : "0 0 10px #000033, 0 0 20px rgba(255, 255, 255, 0.5)", // Added
-              fontSize: "45px",
+              fontSize: "25px",
               marginBottom: "15px",
             }}
           >
             {" "}
-            <i class="fa-solid fa-brain"></i> Mindmap
+            MINDMAP
           </h1>
 
           <button className="new-action-button" onClick={startNewMap}>
