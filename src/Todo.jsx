@@ -890,7 +890,7 @@ function Todo() {
       <div className="main-kontainer">
         <div className="wrapper">
           <div className="page-text">
-            <h1>TODO</h1>
+            <h1>LISTS</h1>
           </div>
         </div>
 
@@ -992,8 +992,9 @@ function Todo() {
                   className="pushable-container"
                   style={{ marginBottom: "30px" }}
                 >
-                  <button className="add-new-note-button" onClick={newTodo}>
-                    <span className="button_top"> ADD TODO </span>
+                  <button className="new-action-button" onClick={newTodo}>
+                    {" "}
+                    ADD LIST &nbsp;<i class="fa-solid fa-plus"></i>{" "}
                   </button>
                 </div>
 
@@ -1170,7 +1171,7 @@ function Todo() {
                     {/* ALL TODOS HEADER - Always show this, even if there are no pinned todos */}
                     <div className="wrapper">
                       <div className="page-text-2">
-                        <h2>ALL LISTS</h2>
+                        <h2>ALL LISTS ({sortedUnpinnedTodos.length})</h2>
                       </div>
                     </div>
                   </div>
