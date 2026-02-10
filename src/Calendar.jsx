@@ -1099,7 +1099,7 @@ function Calendar() {
                 alignItems: "center",
               }}
             >
-              <h2
+              <p
                 style={{
                   fontSize: "22px",
                   margin: 0,
@@ -1110,7 +1110,7 @@ function Calendar() {
                 }}
               >
                 {year}
-              </h2>
+              </p>
             </div>
 
             <button
