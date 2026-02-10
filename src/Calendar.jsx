@@ -1778,7 +1778,7 @@ function Calendar() {
                             //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
                             //     : "none",
 
-                            fontSize: "20px",
+                            fontSize: "16px",
                             // backgroundColor: getEventColorForDate(date),
 
                             cursor: "pointer",

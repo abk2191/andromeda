@@ -1863,13 +1863,13 @@ html {
 .day-names-div {
   display: flex;
   width: 500px;
-  gap: 43px;
-  margin-left: 2px;
+  gap: 44px;
+  margin-left: 10px;
 }
 
 .day-names-div p {
   color: #000033;
-  font-weight: bold;
+
   transition: color 0.3s ease;
 }
 
