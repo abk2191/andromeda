@@ -2454,6 +2454,11 @@ html {
   color: white;
 }
 
+.dark-theme .new-action-button:active {
+  background-color: white;
+  color: black;
+}
+
 .dark-theme .new-action-button {
   border: 1px solid white;
   background-color: #1a1a1a;
