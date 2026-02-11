@@ -10,13 +10,13 @@ const STORAGE_KEY = "mindmaps";
 
 /* 🎨 Fixed color palette (Notes-style) */
 const NODE_COLORS = [
-  "#1A1A2E", // Dark navy
-  "#16213E", // Deep blue
+  "#4343b2", // Dark navy
+  "#1a7a37", // Deep blue
   "#0F3460", // Ocean blue
   "#533483", // Royal purple
   "#0D7377", // Dark teal
-  "#393E46", // Charcoal
-  "#222831", // Gunmetal
+  "#92c02f", // Charcoal
+  "#27cbc3", // Gunmetal
   "#323232", // Dark gray
 ];
 
@@ -282,7 +282,12 @@ export default function Mindmap({ lightTheme }) {
 
           <button
             onClick={() => addChild(node.id)}
-            style={{ border: "none", fontSize: "20px", background: "none" }}
+            style={{
+              border: "none",
+              fontSize: "20px",
+              background: "none",
+              color: isDarkTheme ? "#ffffff" : "#000033",
+            }}
           >
             <i class="fa-solid fa-plus"></i>
           </button>

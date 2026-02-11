@@ -207,14 +207,15 @@ function App() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          gap: "6px",
           height: "100vh",
           backgroundColor: "#000033",
           color: "white",
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <h1>Andromeda</h1>
-          <p>Loading...</p>
+          <h1>Space.</h1>
+          <p style={{ fontSize: "10px" }}>Loading...</p>
         </div>
       </div>
     );
@@ -238,7 +239,7 @@ function App() {
             }}
           >
             <div className="logo">
-              <h3 style={{ color: "white" }}>Andromeda.</h3>
+              <h3 style={{ color: "white" }}>Space.</h3>
             </div>
 
             <button

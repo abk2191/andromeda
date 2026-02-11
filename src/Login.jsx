@@ -120,7 +120,7 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-page-brand-name">
-        <h1>Andromeda.</h1>
+        <h1>Space.</h1>
         <div>
           <i className="fa-solid fa-flask"></i> iINTUIT Labs.
         </div>
