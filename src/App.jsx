@@ -46,12 +46,12 @@ function App() {
     if (isLightTheme) {
       if (color === "rgb(100, 33, 216)") {
         accentColor = "rgb(88, 30, 189)"; // Lighter yellow
-      } else if (color === "gold") {
-        accentColor = "rgb(248, 221, 72)"; // Lighter maroon
+      } else if (color === "rgb(63, 132, 235)") {
+        accentColor = "rgb(57, 115, 202)"; // Lighter maroon
       } else if (color === "#000033") {
-        accentColor = "#030357"; // Lighter navy blue
+        accentColor = "#030342"; // Lighter navy blue
       } else if (color === "rgb(38, 54, 134)") {
-        accentColor = "rgb(30, 43, 105)"; // Lighter green
+        accentColor = "rgb(45, 63, 155)"; // Lighter green
       }
     }
 
@@ -207,15 +207,24 @@ function App() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          gap: "6px",
+          gap: "40px",
           height: "100vh",
           backgroundColor: "#000033",
           color: "white",
         }}
       >
-        <div style={{ textAlign: "center" }}>
+        <div
+          style={{
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "40px",
+          }}
+        >
           <h1>Space.</h1>
-          <p style={{ fontSize: "10px" }}>Loading...</p>
+          <p style={{ fontSize: "14px" }}>Loading...</p>
         </div>
       </div>
     );
@@ -395,7 +404,7 @@ function App() {
                   ></div>
                   <div
                     className="color-maroon-div"
-                    onClick={() => handleThemeChange("gold")}
+                    onClick={() => handleThemeChange("rgb(63, 132, 235)")}
                   ></div>
                   <div
                     className="color-blue-div"
