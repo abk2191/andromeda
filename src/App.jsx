@@ -47,7 +47,7 @@ function App() {
       if (color === "rgb(100, 33, 216)") {
         accentColor = "rgb(88, 30, 189)"; // Lighter yellow
       } else if (color === "gold") {
-        accentColor = "rgb(228, 222, 111)"; // Lighter maroon
+        accentColor = "rgb(248, 221, 72)"; // Lighter maroon
       } else if (color === "#000033") {
         accentColor = "#030357"; // Lighter navy blue
       } else if (color === "rgb(38, 54, 134)") {
