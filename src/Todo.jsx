@@ -209,6 +209,22 @@ function Todo() {
     return dateString;
   };
 
+  // Function to get current formatted timestamp
+  const getCurrentFormattedTimestamp = () => {
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedHours = hours.toString().padStart(2, "0");
+    const monthAbbrev = formatMonth(month);
+    return `${monthAbbrev}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
+  };
+
   // Load all data from Firestore on component mount
   useEffect(() => {
     const loadAllData = async () => {
@@ -612,18 +628,7 @@ function Todo() {
     if (!editingTitle.trim()) return;
 
     // Get current date and time for edited timestamp
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const year = now.getFullYear();
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const formattedHours = hours.toString().padStart(2, "0");
-    const monthAbbrev = formatMonth(month);
-    const editedAtString = `${monthAbbrev}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
+    const editedAtString = getCurrentFormattedTimestamp();
 
     if (isTodoPinned && selectedTodoIndex !== null) {
       const updatedPinnedTodos = pinnedTodos.map((t, i) =>
@@ -652,6 +657,40 @@ function Todo() {
         await saveAllData("todos", updatedTodos);
       } catch (error) {
         console.error("Error saving todo title to Firebase:", error);
+      }
+    }
+  }
+
+  // Update todo editedAt timestamp
+  async function updateTodoEditedTimestamp(todoId) {
+    const editedAtString = getCurrentFormattedTimestamp();
+
+    // Check if todo is pinned
+    const isPinned = pinnedTodos.some((todo) => todo.id === todoId);
+
+    if (isPinned) {
+      const updatedPinnedTodos = pinnedTodos.map((t) =>
+        t.id === todoId ? { ...t, editedAt: editedAtString } : t,
+      );
+      setPinnedTodos(updatedPinnedTodos);
+
+      // Save to Firebase
+      try {
+        await saveAllData("pinnedTodos", updatedPinnedTodos);
+      } catch (error) {
+        console.error("Error saving todo timestamp to Firebase:", error);
+      }
+    } else {
+      const updatedTodos = todos.map((t) =>
+        t.id === todoId ? { ...t, editedAt: editedAtString } : t,
+      );
+      setTodos(updatedTodos);
+
+      // Save to Firebase
+      try {
+        await saveAllData("todos", updatedTodos);
+      } catch (error) {
+        console.error("Error saving todo timestamp to Firebase:", error);
       }
     }
   }
@@ -704,6 +743,9 @@ function Todo() {
 
     setTasks(newTasks);
 
+    // Update editedAt timestamp when adding a task
+    await updateTodoEditedTimestamp(todoId);
+
     // Save to Firebase
     try {
       await saveAllData("todoTasks", newTasks);
@@ -719,6 +761,9 @@ function Todo() {
     };
 
     setTasks(newTasks);
+
+    // Update editedAt timestamp when deleting a task
+    await updateTodoEditedTimestamp(todoId);
 
     // Save to Firebase
     try {
@@ -738,6 +783,9 @@ function Todo() {
 
     setTasks(newTasks);
 
+    // Update editedAt timestamp when toggling task completion
+    await updateTodoEditedTimestamp(todoId);
+
     // Save to Firebase
     try {
       await saveAllData("todoTasks", newTasks);
@@ -747,20 +795,6 @@ function Todo() {
   }
 
   async function updateTaskText(todoId, taskId, newText) {
-    // Get current date and time for edited timestamp
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const year = now.getFullYear();
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const formattedHours = hours.toString().padStart(2, "0");
-    const monthAbbrev = formatMonth(month);
-    const editedAtString = `${monthAbbrev}/${day}/${year} at ${formattedHours}:${minutes} ${ampm}`;
-
     const newTasks = {
       ...tasks,
       [todoId]: (tasks[todoId] || []).map((task) =>
@@ -770,20 +804,8 @@ function Todo() {
 
     setTasks(newTasks);
 
-    // Also update the todo's editedAt timestamp when tasks are modified
-    if (isTodoPinned) {
-      const updatedPinnedTodos = pinnedTodos.map((t) =>
-        t.id === todoId ? { ...t, editedAt: editedAtString } : t,
-      );
-      setPinnedTodos(updatedPinnedTodos);
-      await saveAllData("pinnedTodos", updatedPinnedTodos);
-    } else {
-      const updatedTodos = todos.map((t) =>
-        t.id === todoId ? { ...t, editedAt: editedAtString } : t,
-      );
-      setTodos(updatedTodos);
-      await saveAllData("todos", updatedTodos);
-    }
+    // Update editedAt timestamp when updating task text
+    await updateTodoEditedTimestamp(todoId);
 
     // Save tasks to Firebase
     try {
@@ -996,7 +1018,7 @@ function Todo() {
                 >
                   <button className="new-action-button" onClick={newTodo}>
                     {" "}
-                    ADD LIST &nbsp;<i class="fa-solid fa-plus"></i>{" "}
+                    ADD LIST &nbsp;<i className="fa-solid fa-plus"></i>{" "}
                   </button>
                 </div>
 
