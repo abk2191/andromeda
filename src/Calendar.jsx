@@ -1247,6 +1247,7 @@ function Calendar() {
               style={{
                 display: "flex",
                 marginBottom: "2px",
+                alignItems: "center",
               }}
             >
               {week.map((date, dateIndex) => {
@@ -1295,6 +1296,7 @@ function Calendar() {
                     style={{
                       fontSize: "12px",
                       textAlign: "center",
+
                       padding: "2px 0",
                       // backgroundColor: hasEvent
                       //   ? isDarkTheme
