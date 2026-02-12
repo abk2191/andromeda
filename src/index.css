@@ -2054,7 +2054,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 3.5px;
+  /* margin-bottom: 3.5px; */
 }
 
 .evnt-reminder {
