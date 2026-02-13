@@ -1159,10 +1159,11 @@ html.dark-theme {
 
 .color-selector {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  height: 50px;
+  height: 90px;
   width: 250px;
   border-radius: 8px;
   position: fixed; /* Keep as fixed for dynamic positioning */
@@ -1176,6 +1177,13 @@ html.dark-theme {
   animation: jello 0.4s;
   margin-bottom: 45px;
   margin-left: 7px;
+}
+
+.color-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 /*****************************FOR MINDMAP******************************************/
@@ -1426,6 +1434,14 @@ html {
   width: 30px;
   border: 2px solid #1a1a1a;
   background-color: #1a1a1a;
+  border-radius: 50%;
+}
+
+.plain-blue {
+  height: 30px;
+  width: 30px;
+  border: 2px solid blue;
+  background-color: blue;
   border-radius: 50%;
 }
 
