@@ -224,7 +224,7 @@ function App() {
           }}
         >
           <h1>Space.</h1>
-          <p style={{ fontSize: "14px" }}>Loading...</p>
+          <p style={{ fontSize: "11px" }}>Loading...</p>
         </div>
       </div>
     );
