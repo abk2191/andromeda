@@ -1453,11 +1453,27 @@ html {
   border-radius: 50%;
 }
 
+.red {
+  height: 30px;
+  width: 30px;
+  border: 1px solid red;
+  background-color: red;
+  border-radius: 50%;
+}
+
 .deep-green {
   height: 30px;
   width: 30px;
   border: 1px solid #256025;
   background-color: #256025;
+  border-radius: 50%;
+}
+
+.light-green {
+  height: 30px;
+  width: 30px;
+  border: 1px solid #469b46;
+  background-color: #469b46;
   border-radius: 50%;
 }
 
@@ -1469,6 +1485,14 @@ html {
   border-radius: 50%;
 }
 
+.light-purple {
+  height: 30px;
+  width: 30px;
+  border: 1px solid #762bd1;
+  background-color: #762bd1;
+  border-radius: 50%;
+}
+
 .darkblue {
   height: 30px;
   width: 30px;
@@ -1477,11 +1501,27 @@ html {
   border-radius: 50%;
 }
 
+.gold {
+  height: 30px;
+  width: 30px;
+  border: 1px solid gold;
+  background-color: gold;
+  border-radius: 50%;
+}
+
 .deep-yellow {
   height: 30px;
   width: 30px;
   border: 1px solid #43431aff;
   background-color: #43431aff;
+  border-radius: 50%;
+}
+
+.ocean {
+  height: 30px;
+  width: 30px;
+  border: 1px solid #31908e;
+  background-color: #31908e;
   border-radius: 50%;
 }
 
