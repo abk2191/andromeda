@@ -1028,7 +1028,10 @@ function Todo() {
                     {/* PINNED TODOS HEADER */}
                     <div className="wrapper">
                       <div className="page-text-2">
-                        <h2>PINNED LISTS ({sortedPinnedTodos.length})</h2>
+                        <h2>
+                          <i className="fa-solid fa-thumbtack"></i>
+                          &nbsp;&nbsp;PINNED LISTS ({sortedPinnedTodos.length})
+                        </h2>
                       </div>
                     </div>
 

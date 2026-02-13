@@ -674,7 +674,10 @@ function Notes() {
                     {/* PINNED NOTES HEADER */}
                     <div className="wrapper">
                       <div className="page-text-2">
-                        <h2>PINNED NOTES ({sortedPinnedNotes.length})</h2>
+                        <h2>
+                          <i className="fa-solid fa-thumbtack"></i>
+                          &nbsp;&nbsp;PINNED NOTES ({sortedPinnedNotes.length})
+                        </h2>
                       </div>
                     </div>
 
@@ -798,7 +801,7 @@ function Notes() {
                                   onClick={(e) => unpinNote(note.id, e)}
                                   title="Unpin note"
                                 >
-                                  <i className="fa-solid fa-link-slash"></i>
+                                  <i class="fa-solid fa-link-slash"></i>
                                 </button>
 
                                 <button
