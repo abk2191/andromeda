@@ -1145,7 +1145,7 @@ function Todo() {
                                 )}
 
                                 <div className="btn-cntnr">
-                                  <div>
+                                  {/* <div>
                                     <input
                                       type="color"
                                       className="color-picker"
@@ -1157,7 +1157,7 @@ function Todo() {
                                         )
                                       }
                                     />
-                                  </div>
+                                  </div> */}
                                   <button
                                     className="dlt-btn"
                                     title="Select Color"
@@ -1326,7 +1326,7 @@ function Todo() {
                             </div>
                           )}
                           <div className="btn-cntnr">
-                            <div>
+                            {/* <div>
                               <input
                                 type="color"
                                 className="color-picker"
@@ -1335,7 +1335,7 @@ function Todo() {
                                   changeBackgroundColor(todo.id, e.target.value)
                                 }
                               />
-                            </div>
+                            </div> */}
                             <button
                               className="dlt-btn"
                               title="Select Color"

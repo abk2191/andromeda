@@ -770,7 +770,7 @@ function Notes() {
                               )}
 
                               <div className="btn-cntnr">
-                                <div>
+                                {/* <div>
                                   <input
                                     type="color"
                                     className="color-picker"
@@ -782,7 +782,7 @@ function Notes() {
                                       )
                                     }
                                   />
-                                </div>
+                                </div> */}
                                 <button
                                   className="dlt-btn"
                                   title="Select Color"
@@ -928,7 +928,7 @@ function Notes() {
                           </div>
                         )}
                         <div className="btn-cntnr">
-                          <div>
+                          {/* <div>
                             <input
                               type="color"
                               className="color-picker"
@@ -937,7 +937,7 @@ function Notes() {
                                 changeBackgroundColor(note.id, e.target.value)
                               }
                             />
-                          </div>
+                          </div> */}
                           <button
                             className="dlt-btn"
                             title="Select Color"
