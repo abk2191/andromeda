@@ -1313,10 +1313,16 @@ function Calendar() {
                               ? "white"
                               : "#000033",
                       // textShadow: isToday ? "0 0 3px red" : "none",
-                      borderRadius: hasEvent ? "3px" : "0",
+                      borderRadius: "8px",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
-
+                      border: hasEvent
+                        ? "1px solid green"
+                        : date === todayDate &&
+                            monthData.monthNumber === today.getMonth() &&
+                            year === today.getFullYear()
+                          ? "1px solid gold"
+                          : "none",
                       flex: "1",
                       minWidth: "0",
                     }}
@@ -1803,7 +1809,12 @@ function Calendar() {
 
                             fontSize: "16px",
                             // backgroundColor: getEventColorForDate(date),
-
+                            border: hasEvent
+                              ? "1px solid green"
+                              : date === todayDate
+                                ? "1px solid gold"
+                                : "none",
+                            borderRadius: "8px",
                             cursor: "pointer",
                             ...borderStyle,
                             padding: "2px 8px",
