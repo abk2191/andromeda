@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import EventEditor from "./EventEditor";
 import LiveClock from "./LiveClock";
+import notificationService from "./services/notificationService";
 import {
   saveCalendarData,
   loadCalendarData,
@@ -11,6 +12,10 @@ import {
   saveCalendarReminders,
   loadCalendarReminders,
 } from "./firestore-helpers";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { db, auth } from "./firebase.js";
+import { doc, setDoc, collection, deleteDoc } from "firebase/firestore";
+import { query, where, getDocs, updateDoc } from "firebase/firestore";
 
 function useDarkTheme() {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
@@ -43,9 +48,10 @@ function useDarkTheme() {
 }
 
 function Calendar() {
-  const reminderTimeoutsRef = useRef({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [fcmToken, setFcmToken] = useState(null);
+  const [notificationPermission, setNotificationPermission] = useState(false);
 
   // All states initialized as empty - will be populated by Firestore
   const [event, setEvent] = useState([]);
@@ -57,7 +63,6 @@ function Calendar() {
   const [yearViewYear, setYearViewYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [reminders, setReminders] = useState([]);
   const [showEventEditor, setShowEventEditor] = useState(false);
   const [deleteWarningActive, setDeleteWarningActive] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
@@ -66,6 +71,284 @@ function Calendar() {
 
   // Track if data has been loaded to prevent overwriting
   const hasLoadedRef = useRef(false);
+
+  // VAPID Key - REPLACE THIS WITH YOUR ACTUAL KEY FROM FIREBASE CONSOLE
+  const VAPID_KEY =
+    "BJX394ZmLSR1x0DOBgEUdQDt7k1CWBXuj43waPiibdLCGQ-1CsC3nzq_ky30fDoHdL5n0s020ClKepxgGcDONt8"; // Get this from Firebase Console > Project Settings > Cloud Messaging
+
+  // Initialize FCM and get token when user is authenticated
+  // Initialize FCM and get token when user is authenticated
+  // In Calendar.jsx, update the initializeFCM function:
+
+  // In Calendar.jsx, update the initializeFCM function:
+
+  // In Calendar.jsx, update the initializeFCM function:
+
+  useEffect(() => {
+    const checkDueNotifications = async () => {
+      if (!isAuthenticated) return;
+
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const now = Date.now();
+      const oneMinuteAgo = now - 60000; // Check notifications due in the last minute
+      const oneMinuteFromNow = now + 60000; // Also check upcoming
+
+      try {
+        const notificationsRef = collection(
+          db,
+          "users",
+          user.uid,
+          "pushNotifications",
+        );
+
+        // Query for notifications that are due now
+        const q = query(
+          notificationsRef,
+          where("fireAt", "<=", now),
+          where("fireAt", ">=", oneMinuteAgo),
+          where("status", "==", "scheduled"),
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          console.log(
+            "⏰ No due notifications at",
+            new Date().toLocaleTimeString(),
+          );
+          return;
+        }
+
+        console.log(`🔔 Found ${snapshot.size} due notifications!`);
+
+        // Show notifications for each due reminder
+        snapshot.forEach(async (doc) => {
+          const notification = doc.data();
+
+          console.log("Showing notification:", notification.body);
+
+          // Show browser notification
+          if (Notification.permission === "granted") {
+            new Notification(notification.title || "🔔 Calendar Reminder", {
+              body: notification.body,
+              icon: "/icon-192x192.png",
+              requireInteraction: true,
+              vibrate: [200, 100, 200],
+            });
+          }
+
+          // Mark as sent in Firestore
+          await updateDoc(doc.ref, {
+            status: "sent",
+            sentAt: new Date().toISOString(),
+          });
+        });
+      } catch (error) {
+        console.error("Error checking notifications:", error);
+      }
+    };
+
+    // Check immediately
+    checkDueNotifications();
+
+    // Then check every 30 seconds
+    const interval = setInterval(checkDueNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const initializeFCM = async () => {
+      if (!isAuthenticated) return;
+
+      try {
+        // Define basePath here - match your vite.config.js base
+        const basePath = "/andromeda/"; // Make sure this matches your Vite config
+
+        const messaging = getMessaging();
+
+        // Register service worker with correct path before getting token
+        if ("serviceWorker" in navigator) {
+          const swUrl = `${window.location.origin}${basePath}firebase-messaging-sw.js`;
+
+          console.log("📱 Registering service worker at:", swUrl);
+
+          // Register first
+          const registration = await navigator.serviceWorker.register(swUrl, {
+            scope: basePath,
+          });
+
+          console.log(
+            "✅ Service Worker registered by Firebase with scope:",
+            registration.scope,
+          );
+        }
+
+        // Then request permission and get token
+        const permission = await Notification.requestPermission();
+
+        if (permission === "granted") {
+          setNotificationPermission(true);
+
+          // Get the registration to pass to getToken
+          const registration =
+            await navigator.serviceWorker.getRegistration(basePath);
+
+          const token = await getToken(messaging, {
+            vapidKey:
+              "BJX394ZmLSR1x0DOBgEUdQDt7k1CWBXuj43waPiibdLCGQ-1CsC3nzq_ky30fDoHdL5n0s020ClKepxgGcDONt8",
+            serviceWorkerRegistration: registration,
+          });
+
+          if (token) {
+            setFcmToken(token);
+            await saveTokenToFirestore(token);
+            console.log("✅ FCM Token obtained:", token);
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing FCM:", error);
+      }
+    };
+
+    initializeFCM();
+  }, [isAuthenticated]);
+  // Save FCM token to Firestore
+  const saveTokenToFirestore = async (token) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const tokenRef = doc(db, "users", user.uid, "fcmTokens", token);
+      await setDoc(tokenRef, {
+        token,
+        userAgent: navigator.userAgent,
+        createdAt: new Date().toISOString(),
+        lastUsed: new Date().toISOString(),
+      });
+      console.log("✅ FCM token saved to Firestore");
+    } catch (error) {
+      console.error("Error saving FCM token:", error);
+    }
+  };
+
+  // Schedule push notification in Firestore
+  const schedulePushNotification = async (reminderData) => {
+    const notificationId =
+      await notificationService.scheduleNotification(reminderData);
+    if (notificationId) {
+      alert(
+        `✅ Reminder scheduled for ${new Date(reminderData.fireAt).toLocaleString()}`,
+      );
+    }
+    return notificationId;
+  };
+
+  // Enhanced reminder function with push notifications
+  async function addReminderForSelectedDate() {
+    if (!selectedDate) {
+      alert("Select a date first");
+      return;
+    }
+
+    // Check authentication
+    if (!isAuthenticated) {
+      alert("Please sign in to set reminders");
+      return;
+    }
+
+    // Check notification permission
+    if (!notificationPermission) {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        alert(
+          "Notification permission is required for reminders. Please enable it in your browser settings.",
+        );
+        return;
+      }
+      setNotificationPermission(true);
+    }
+
+    const timeInput = prompt(
+      "Enter reminder time (HH:MM, 24h format)",
+      "09:00",
+    );
+    if (!timeInput) return;
+
+    const [hh, mm] = timeInput.split(":").map(Number);
+    if (isNaN(hh) || isNaN(mm) || hh < 0 || hh > 23 || mm < 0 || mm > 59) {
+      alert("Invalid time format. Please use HH:MM (e.g., 14:30)");
+      return;
+    }
+
+    const message = prompt("Reminder message:");
+    if (!message) return;
+
+    const reminderDate = new Date(
+      currentYear,
+      currentMonth,
+      selectedDate,
+      hh,
+      mm,
+      0,
+      0,
+    );
+    const fireAt = reminderDate.getTime();
+
+    if (fireAt <= Date.now()) {
+      alert("Reminder time must be in the future");
+      return;
+    }
+
+    // Check if there are events on this date to associate with
+    const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
+    const eventsForDate = event.filter((e) => e.dateKeys?.includes(dateKey));
+
+    let eventId = null;
+    let eventName = null;
+
+    if (eventsForDate.length > 0) {
+      const eventOptions = eventsForDate
+        .map((e, i) => `${i + 1}. ${e.name}${e.time ? ` at ${e.time}` : ""}`)
+        .join("\n");
+
+      const choice = prompt(
+        `Events on this date:\n${eventOptions}\n\nEnter the number to associate with this reminder, or press Enter for a generic reminder:`,
+      );
+
+      if (choice && !isNaN(parseInt(choice))) {
+        const selectedIndex = parseInt(choice) - 1;
+        if (selectedIndex >= 0 && selectedIndex < eventsForDate.length) {
+          const selectedEvent = eventsForDate[selectedIndex];
+          eventId = selectedEvent.id;
+          eventName = selectedEvent.name;
+        }
+      }
+    }
+
+    // Schedule the push notification
+    const reminderData = {
+      message: eventName ? `Reminder: ${eventName} - ${message}` : message,
+      fireAt: fireAt,
+      dateKey: dateKey,
+      eventId: eventId,
+      eventName: eventName,
+      originalMessage: message,
+    };
+
+    console.log("🔍 reminderData being sent:", {
+      message: reminderData.message,
+      fireAt: reminderData.fireAt,
+      fireAtDate: reminderData.fireAt
+        ? new Date(reminderData.fireAt).toLocaleString()
+        : "MISSING",
+      dateKey: reminderData.dateKey,
+    });
+
+    await schedulePushNotification(reminderData);
+  }
 
   //********************************************************************/
 
@@ -87,7 +370,6 @@ function Calendar() {
             setEvent([]);
             setMoods([]);
             setDateColors({});
-            setReminders([]);
           }
         }
       });
@@ -109,13 +391,11 @@ function Calendar() {
       const loadedEvents = await loadCalendarData();
       const loadedMoods = await loadCalendarMoods();
       const loadedDateColors = await loadCalendarDateColors();
-      const loadedReminders = await loadCalendarReminders();
 
       // Update all states with loaded data
       setEvent(loadedEvents || []);
       setMoods(loadedMoods || []);
       setDateColors(loadedDateColors || {});
-      setReminders(loadedReminders || []);
 
       hasLoadedRef.current = true;
 
@@ -123,14 +403,12 @@ function Calendar() {
         events: loadedEvents?.length || 0,
         moods: loadedMoods?.length || 0,
         dateColors: loadedDateColors ? Object.keys(loadedDateColors).length : 0,
-        reminders: loadedReminders?.length || 0,
       });
     } catch (error) {
       console.error("Error loading calendar data from Firestore:", error);
       setEvent([]);
       setMoods([]);
       setDateColors({});
-      setReminders([]);
       hasLoadedRef.current = true;
     } finally {
       setIsLoading(false);
@@ -203,25 +481,6 @@ function Calendar() {
       saveDateColors();
     }
   }, [dateColors, isAuthenticated]);
-
-  // Save reminders to Firestore when they change
-  useEffect(() => {
-    const saveReminders = async () => {
-      if (isAuthenticated && hasLoadedRef.current) {
-        try {
-          console.log("💾 Saving reminders to Firestore:", reminders.length);
-          await saveCalendarReminders(reminders);
-          console.log("✅ Reminders saved to Firestore");
-        } catch (error) {
-          console.error("❌ Error saving reminders to Firestore:", error);
-        }
-      }
-    };
-
-    if (hasLoadedRef.current) {
-      saveReminders();
-    }
-  }, [reminders, isAuthenticated]);
 
   const isDarkTheme = useDarkTheme();
 
@@ -416,98 +675,6 @@ function Calendar() {
     }
   };
 
-  useEffect(() => {
-    console.log("⏳ Scheduling reminders:", reminders);
-
-    Object.values(reminderTimeoutsRef.current).forEach(clearTimeout);
-    reminderTimeoutsRef.current = {};
-
-    const now = Date.now();
-
-    reminders.forEach((reminder) => {
-      if (reminder.fired) return;
-
-      const delay = reminder.fireAt - now;
-      console.log("⏱ Reminder delay(ms):", delay, reminder);
-
-      if (delay <= 0) return;
-
-      const timeoutId = setTimeout(async () => {
-        try {
-          const reg = window.__SW_REG || (await navigator.serviceWorker.ready);
-
-          await reg.showNotification("⏰ Reminder", {
-            body: reminder.message,
-            vibrate: [200, 100, 200],
-          });
-
-          setReminders((prev) =>
-            prev.map((r) => (r.id === reminder.id ? { ...r, fired: true } : r)),
-          );
-        } catch (err) {
-          console.error("Reminder error:", err);
-        }
-      }, delay);
-
-      reminderTimeoutsRef.current[reminder.id] = timeoutId;
-    });
-  }, [reminders]);
-
-  async function addReminderForSelectedDate() {
-    if (!selectedDate) {
-      alert("Select a date first");
-      return;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      alert("Notification permission required");
-      return;
-    }
-
-    const timeInput = prompt("Enter reminder time (HH:MM, 24h)", "09:00");
-    if (!timeInput) return;
-
-    const [hh, mm] = timeInput.split(":").map(Number);
-    if (isNaN(hh) || isNaN(mm)) {
-      alert("Invalid time format");
-      return;
-    }
-
-    const message = prompt("Reminder message:");
-    if (!message) return;
-
-    const fireDate = new Date(
-      currentYear,
-      currentMonth,
-      selectedDate,
-      hh,
-      mm,
-      0,
-      0,
-    );
-
-    const fireAt = fireDate.getTime();
-
-    if (fireAt <= Date.now()) {
-      alert("Time must be in the future");
-      return;
-    }
-
-    const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
-
-    const newReminder = {
-      id: Date.now(),
-      dateKey,
-      fireAt,
-      message,
-      fired: false,
-    };
-
-    setReminders((prev) => [...prev, newReminder]);
-    alert("✅ Reminder saved");
-  }
-
   function ensureNotificationPermission() {
     if (!("Notification" in window)) {
       alert("Notifications are not supported in this browser.");
@@ -535,7 +702,7 @@ function Calendar() {
     });
   }
 
-  ensureNotificationPermission();
+  //ensureNotificationPermission();
 
   function getMonthDatesByWeekday(month, year) {
     const now = new Date();
@@ -800,7 +967,6 @@ function Calendar() {
     onAddReminder,
     onEventDelete,
     onEventEdit,
-    reminders,
   }) {
     const dateKey = `${currentYear}-${currentMonth + 1}-${selectedDate}`;
     const eventsForSelectedDate = event.filter(
@@ -1081,9 +1247,6 @@ function Calendar() {
                 color: isDarkTheme ? "white" : "#000033",
                 fontSize: "22px",
                 cursor: "pointer",
-                // textShadow: isDarkTheme
-                //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
               title="Previous Year"
             >
@@ -1102,9 +1265,6 @@ function Calendar() {
                   fontSize: "22px",
                   margin: 0,
                   color: isDarkTheme ? "white" : "#000033",
-                  // textShadow: isDarkTheme
-                  //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                  //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
                 }}
               >
                 {year}
@@ -1119,9 +1279,6 @@ function Calendar() {
                 color: isDarkTheme ? "white" : "#000033",
                 fontSize: "22px",
                 cursor: "pointer",
-                // textShadow: isDarkTheme
-                //   ? "0 0 10px white, 0 0 20px rgba(255, 255, 255, 0.5)"
-                //   : "0 0 10px #32327a, 0 0 20px rgba(255, 255, 255, 0.5)",
               }}
             >
               <i className="fa-solid fa-angles-right"></i>
@@ -1298,11 +1455,6 @@ function Calendar() {
                       textAlign: "center",
 
                       padding: "2px 0",
-                      // backgroundColor: hasEvent
-                      //   ? isDarkTheme
-                      //     ? "#32327a"
-                      //     : "#000033"
-                      //   : "transparent",
                       color: isToday
                         ? "gold"
                         : hasEvent
@@ -1312,7 +1464,6 @@ function Calendar() {
                             : isDarkTheme
                               ? "white"
                               : "#000033",
-                      // textShadow: isToday ? "0 0 3px red" : "none",
                       borderRadius: "8px",
                       cursor: hasEvent ? "pointer" : "default",
                       fontWeight: hasEvent ? "bold" : "normal",
@@ -1776,7 +1927,6 @@ function Calendar() {
                       let borderStyle = {};
                       if (hasEvent) {
                         borderStyle = {
-                          // border: "2px solid white",
                           borderRadius: "8px",
                         };
                       }
@@ -1794,7 +1944,7 @@ function Calendar() {
                           style={{
                             color:
                               date === todayDate
-                                ? "gold" // Today - blue
+                                ? "gold" // Today - gold
                                 : hasEvent
                                   ? "green" // Events - green
                                   : isSunday
@@ -1802,13 +1952,8 @@ function Calendar() {
                                     : isDarkTheme
                                       ? "white" // Dark theme: white text
                                       : "#000033", // Light theme: dark blue text
-                            // textShadow:
-                            //   date === todayDate
-                            //     ? "0 0 10px red, 0 0 20px rgba(255, 255, 255, 0.5)"
-                            //     : "none",
 
                             fontSize: "16px",
-                            // backgroundColor: getEventColorForDate(date),
                             border: hasEvent
                               ? "1px solid green"
                               : date === todayDate
@@ -1857,7 +2002,6 @@ function Calendar() {
               onAddReminder={addReminderForSelectedDate}
               onEventDelete={onEventDelete}
               onEventEdit={handleEditEvent}
-              reminders={reminders}
             />
 
             {showEventEditor && (
