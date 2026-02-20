@@ -238,7 +238,17 @@ class NotificationService {
     };
 
     try {
-      new Notification(title, options);
+      // Try service worker first
+      navigator.serviceWorker
+        .getRegistration("/andromeda/")
+        .then((registration) => {
+          if (registration) {
+            registration.showNotification(title, options);
+          } else {
+            // Fallback to regular notification
+            new Notification(title, options);
+          }
+        });
     } catch (error) {
       console.error("❌ Error showing browser notification:", error);
     }

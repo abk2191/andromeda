@@ -95,9 +95,7 @@ function Calendar() {
 
       const now = Date.now();
       const oneMinuteAgo = now - 60000;
-      const oneMinuteFromNow = now + 60000;
 
-      // Get this device's unique ID
       const thisDeviceId = localStorage.getItem("calendar_device_id");
       if (!thisDeviceId) return;
 
@@ -109,16 +107,12 @@ function Calendar() {
           "pushNotifications",
         );
 
-        // Query for notifications that:
-        // 1. Are due now
-        // 2. Are scheduled for THIS DEVICE ONLY
-        // 3. Have status "scheduled"
         const q = query(
           notificationsRef,
           where("fireAt", "<=", now),
           where("fireAt", ">=", oneMinuteAgo),
           where("status", "==", "scheduled"),
-          where("deviceId", "==", thisDeviceId), // 👈 Only get notifications for this device
+          where("deviceId", "==", thisDeviceId),
         );
 
         const snapshot = await getDocs(q);
@@ -135,6 +129,10 @@ function Calendar() {
           `🔔 Found ${snapshot.size} due notifications for this device!`,
         );
 
+        // Get the service worker registration
+        const registration =
+          await navigator.serviceWorker.getRegistration("/andromeda/");
+
         // Show notifications for each due reminder
         snapshot.forEach(async (doc) => {
           const notification = doc.data();
@@ -144,14 +142,38 @@ function Calendar() {
             notification.body,
           );
 
-          // Show browser notification
-          if (Notification.permission === "granted") {
-            new Notification(notification.title || "🔔 Calendar Reminder", {
-              body: notification.body,
-              icon: "/icon-192x192.png",
-              requireInteraction: true,
-              vibrate: [200, 100, 200],
-            });
+          // ✅ FIXED: Use service worker to show notification
+          if (registration && Notification.permission === "granted") {
+            await registration.showNotification(
+              notification.title || "🔔 Calendar Reminder",
+              {
+                body: notification.body,
+                icon: "/icon-192x192.png",
+                badge: "/badge-72x72.png",
+                tag: notification.id,
+                requireInteraction: true,
+                vibrate: [200, 100, 200],
+                data: notification.data,
+                actions: [
+                  {
+                    action: "view",
+                    title: "👁️ View Calendar",
+                  },
+                  {
+                    action: "dismiss",
+                    title: "❌ Dismiss",
+                  },
+                ],
+              },
+            );
+          } else {
+            // Fallback for desktop (though this will also fail on mobile)
+            if (Notification.permission === "granted") {
+              new Notification(notification.title || "🔔 Calendar Reminder", {
+                body: notification.body,
+                icon: "/icon-192x192.png",
+              });
+            }
           }
 
           // Mark as sent in Firestore
