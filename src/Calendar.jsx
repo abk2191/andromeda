@@ -179,35 +179,42 @@ function Calendar() {
       if (!isAuthenticated) return;
 
       try {
-        // Define basePath here - match your vite.config.js base
-        const basePath = "/andromeda/"; // Make sure this matches your Vite config
+        console.log("📱 Starting FCM init on:", navigator.userAgent);
+        console.log(
+          "📱 Is mobile?",
+          /Mobile|Android|iP(hone|od)/.test(navigator.userAgent),
+        );
 
+        const basePath = "/andromeda/";
         const messaging = getMessaging();
 
-        // Register service worker with correct path before getting token
         if ("serviceWorker" in navigator) {
           const swUrl = `${window.location.origin}${basePath}firebase-messaging-sw.js`;
-
           console.log("📱 Registering service worker at:", swUrl);
 
-          // Register first
           const registration = await navigator.serviceWorker.register(swUrl, {
             scope: basePath,
           });
 
           console.log(
-            "✅ Service Worker registered by Firebase with scope:",
+            "✅ Service Worker registered with scope:",
             registration.scope,
           );
+
+          // Check if service worker is active
+          if (registration.active) {
+            console.log("✅ Service Worker is active");
+          } else {
+            console.log("⏳ Service Worker is not active yet");
+          }
         }
 
-        // Then request permission and get token
         const permission = await Notification.requestPermission();
+        console.log("📱 Notification permission result:", permission);
 
         if (permission === "granted") {
           setNotificationPermission(true);
 
-          // Get the registration to pass to getToken
           const registration =
             await navigator.serviceWorker.getRegistration(basePath);
 
@@ -218,13 +225,17 @@ function Calendar() {
           });
 
           if (token) {
+            console.log("✅ FCM Token obtained successfully on mobile!");
             setFcmToken(token);
             await saveTokenToFirestore(token);
-            console.log("✅ FCM Token obtained:", token);
+          } else {
+            console.log(
+              "❌ No FCM token returned - this is why mobile isn't working",
+            );
           }
         }
       } catch (error) {
-        console.error("Error initializing FCM:", error);
+        console.error("❌ Error initializing FCM on mobile:", error);
       }
     };
 

@@ -134,17 +134,24 @@ class NotificationService {
     }
 
     try {
+      // Get device ID and type
+      const deviceId = this.getDeviceId();
+      const deviceType = this.getDeviceType();
+
       const tokenRef = doc(db, "users", user.uid, "fcmTokens", token);
       await setDoc(tokenRef, {
         token,
         userId: user.uid,
         userEmail: user.email,
         userAgent: navigator.userAgent,
-        platform: "web",
+        platform: deviceType, // 👈 FIXED: Use actual device type
+        deviceId: deviceId, // 👈 Add device ID here too
         createdAt: new Date().toISOString(),
         lastUsed: new Date().toISOString(),
       });
-      console.log("✅ FCM token saved to Firestore");
+      console.log(
+        `✅ FCM token saved to Firestore with platform: ${deviceType}`,
+      );
     } catch (error) {
       console.error("❌ Error saving FCM token:", error);
     }
