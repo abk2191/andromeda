@@ -46,8 +46,8 @@ messaging.onBackgroundMessage((payload) => {
   // Notification options
   const notificationOptions = {
     body: notificationBody,
-    icon: "/icon-192x192.png",
-    badge: "/badge-72x72.png",
+    icon: "/andromeda/android-icon-192x192.png",
+    //badge: "/badge-72x72.png",
     tag: notificationData.eventId || "calendar-notification",
     data: notificationData,
     requireInteraction: true,

@@ -148,8 +148,8 @@ function Calendar() {
               notification.title || "🔔 Calendar Reminder",
               {
                 body: notification.body,
-                icon: "/icon-192x192.png",
-                badge: "/badge-72x72.png",
+                icon: "/andromeda/android-icon-192x192.png",
+                //badge: "/badge-72x72.png",
                 tag: notification.id,
                 requireInteraction: true,
                 vibrate: [200, 100, 200],
@@ -211,7 +211,7 @@ function Calendar() {
         const messaging = getMessaging();
 
         if ("serviceWorker" in navigator) {
-          const swUrl = `${window.location.origin}/firebase-messaging-sw.js`;
+          const swUrl = `${window.location.origin}/andromeda/firebase-messaging-sw.js`;
           console.log("📱 Registering service worker at:", swUrl);
 
           const registration = await navigator.serviceWorker.register(swUrl, {
