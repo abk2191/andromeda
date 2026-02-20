@@ -149,7 +149,7 @@ function Calendar() {
               {
                 body: notification.body,
                 icon: "/andromeda/android-icon-192x192.png",
-                //badge: "/badge-72x72.png",
+                badge: "/andromeda/android-icon-192x192.png",
                 tag: notification.id,
                 requireInteraction: true,
                 vibrate: [200, 100, 200],
