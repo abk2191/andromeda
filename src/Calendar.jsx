@@ -189,11 +189,11 @@ function Calendar() {
         const messaging = getMessaging();
 
         if ("serviceWorker" in navigator) {
-          const swUrl = `${window.location.origin}${basePath}firebase-messaging-sw.js`;
+          const swUrl = `${window.location.origin}/firebase-messaging-sw.js`;
           console.log("📱 Registering service worker at:", swUrl);
 
           const registration = await navigator.serviceWorker.register(swUrl, {
-            scope: basePath,
+            scope: "/andromeda/", // Keep the scope as /andromeda/ since your app is there
           });
 
           console.log(

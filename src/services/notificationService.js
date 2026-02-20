@@ -98,8 +98,16 @@ class NotificationService {
         this.messaging = getMessaging();
       }
 
+      // Try to get the service worker registration
+      let registration = null;
+      if ("serviceWorker" in navigator) {
+        registration =
+          await navigator.serviceWorker.getRegistration("/andromeda/");
+      }
+
       const currentToken = await getToken(this.messaging, {
         vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: registration, // Pass the registration
       });
 
       if (currentToken) {
