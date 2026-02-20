@@ -232,17 +232,19 @@ class NotificationService {
   /**
    * Schedule a push notification in Firestore
    */
+  // In notificationService.js, update the scheduleNotification method:
+
   async scheduleNotification(reminderData) {
     const user = auth.currentUser;
-    if (!user) {
-      console.log("📱 No user signed in, cannot schedule notification");
-      return null;
-    }
+    if (!user) return null;
 
     try {
       const notificationRef = doc(
         collection(db, "users", user.uid, "pushNotifications"),
       );
+
+      // Generate or get a unique device ID
+      const deviceId = this.getDeviceId();
 
       await setDoc(notificationRef, {
         id: notificationRef.id,
@@ -257,6 +259,8 @@ class NotificationService {
         scheduledFor: new Date(reminderData.fireAt).toISOString(),
         status: "scheduled",
         createdAt: new Date().toISOString(),
+        deviceId: deviceId, // 👈 Add device ID
+        deviceType: this.getDeviceType(), // 👈 Add device type for debugging
         data: {
           click_action: "OPEN_CALENDAR",
           date: reminderData.dateKey,
@@ -266,10 +270,7 @@ class NotificationService {
         },
       });
 
-      console.log(
-        "✅ Push notification scheduled in Firestore:",
-        notificationRef.id,
-      );
+      console.log("✅ Push notification scheduled for device:", deviceId);
       return notificationRef.id;
     } catch (error) {
       console.error("❌ Error scheduling push notification:", error);
@@ -277,6 +278,36 @@ class NotificationService {
     }
   }
 
+  // Add helper methods to notificationService.js:
+
+  getDeviceId() {
+    // Try to get existing device ID from localStorage
+    let deviceId = localStorage.getItem("calendar_device_id");
+
+    if (!deviceId) {
+      // Generate a new device ID
+      deviceId =
+        "device_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("calendar_device_id", deviceId);
+    }
+
+    return deviceId;
+  }
+
+  getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+      return "tablet";
+    }
+    if (
+      /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+        ua,
+      )
+    ) {
+      return "mobile";
+    }
+    return "desktop";
+  }
   /**
    * Cancel a scheduled notification
    */

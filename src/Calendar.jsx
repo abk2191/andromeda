@@ -84,6 +84,8 @@ function Calendar() {
 
   // In Calendar.jsx, update the initializeFCM function:
 
+  // In Calendar.jsx, update the checkDueNotifications function:
+
   useEffect(() => {
     const checkDueNotifications = async () => {
       if (!isAuthenticated) return;
@@ -92,8 +94,12 @@ function Calendar() {
       if (!user) return;
 
       const now = Date.now();
-      const oneMinuteAgo = now - 60000; // Check notifications due in the last minute
-      const oneMinuteFromNow = now + 60000; // Also check upcoming
+      const oneMinuteAgo = now - 60000;
+      const oneMinuteFromNow = now + 60000;
+
+      // Get this device's unique ID
+      const thisDeviceId = localStorage.getItem("calendar_device_id");
+      if (!thisDeviceId) return;
 
       try {
         const notificationsRef = collection(
@@ -103,31 +109,40 @@ function Calendar() {
           "pushNotifications",
         );
 
-        // Query for notifications that are due now
+        // Query for notifications that:
+        // 1. Are due now
+        // 2. Are scheduled for THIS DEVICE ONLY
+        // 3. Have status "scheduled"
         const q = query(
           notificationsRef,
           where("fireAt", "<=", now),
           where("fireAt", ">=", oneMinuteAgo),
           where("status", "==", "scheduled"),
+          where("deviceId", "==", thisDeviceId), // 👈 Only get notifications for this device
         );
 
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
           console.log(
-            "⏰ No due notifications at",
+            "⏰ No due notifications for this device at",
             new Date().toLocaleTimeString(),
           );
           return;
         }
 
-        console.log(`🔔 Found ${snapshot.size} due notifications!`);
+        console.log(
+          `🔔 Found ${snapshot.size} due notifications for this device!`,
+        );
 
         // Show notifications for each due reminder
         snapshot.forEach(async (doc) => {
           const notification = doc.data();
 
-          console.log("Showing notification:", notification.body);
+          console.log(
+            "Showing notification on correct device:",
+            notification.body,
+          );
 
           // Show browser notification
           if (Notification.permission === "granted") {
@@ -216,19 +231,33 @@ function Calendar() {
     initializeFCM();
   }, [isAuthenticated]);
   // Save FCM token to Firestore
+  // In Calendar.jsx, update the saveTokenToFirestore function:
+
   const saveTokenToFirestore = async (token) => {
     const user = auth.currentUser;
     if (!user) return;
 
     try {
+      const deviceId =
+        localStorage.getItem("calendar_device_id") ||
+        "device_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+
+      if (!localStorage.getItem("calendar_device_id")) {
+        localStorage.setItem("calendar_device_id", deviceId);
+      }
+
       const tokenRef = doc(db, "users", user.uid, "fcmTokens", token);
       await setDoc(tokenRef, {
         token,
+        deviceId: deviceId, // 👈 Store device ID with token
         userAgent: navigator.userAgent,
+        platform: /Mobile|Android|iP(hone|od)/.test(navigator.userAgent)
+          ? "mobile"
+          : "desktop",
         createdAt: new Date().toISOString(),
         lastUsed: new Date().toISOString(),
       });
-      console.log("✅ FCM token saved to Firestore");
+      console.log("✅ FCM token saved to Firestore with device ID:", deviceId);
     } catch (error) {
       console.error("Error saving FCM token:", error);
     }
