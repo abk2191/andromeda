@@ -82,10 +82,24 @@ async function checkNotifications() {
     const usersSnapshot = await db.collection("users").get();
     let totalSent = 0;
 
-    console.log(`👥 Found ${usersSnapshot.size} users`);
+    // 🔍 DETAILED USER LOGGING
+    console.log(`👥 Found ${usersSnapshot.size} users total`);
+
+    // Log each user ID
+    if (usersSnapshot.size > 0) {
+      console.log("📋 Listing all users:");
+      usersSnapshot.forEach((doc, index) => {
+        console.log(`   User ${index + 1}: ${doc.id}`);
+        // Optional: Log user document data
+        // console.log(`      Data:`, doc.data());
+      });
+    } else {
+      console.log("❌ NO USERS FOUND - Check Firestore permissions!");
+    }
 
     for (const userDoc of usersSnapshot.docs) {
       const userId = userDoc.id;
+      console.log(`\n🔍 Processing user: ${userId}`);
 
       // Find due notifications
       const dueNotifications = await db
@@ -97,9 +111,25 @@ async function checkNotifications() {
         .where("status", "==", "scheduled")
         .get();
 
-      if (dueNotifications.empty) continue;
+      console.log(
+        `   📋 Found ${dueNotifications.size} due notifications for this user`,
+      );
 
-      console.log(`📋 Found ${dueNotifications.size} for user ${userId}`);
+      if (dueNotifications.empty) {
+        console.log(`   ⏰ No due notifications for user ${userId}`);
+        continue;
+      }
+
+      // Log each due notification
+      dueNotifications.forEach((notifDoc, index) => {
+        const notif = notifDoc.data();
+        console.log(`   📝 Notification ${index + 1}:`);
+        console.log(`      ID: ${notifDoc.id}`);
+        console.log(`      Title: ${notif.title}`);
+        console.log(`      Body: ${notif.body}`);
+        console.log(`      FireAt: ${new Date(notif.fireAt).toLocaleString()}`);
+        console.log(`      Status: ${notif.status}`);
+      });
 
       // Get user's FCM tokens (document IDs are the tokens)
       const tokensSnapshot = await db
@@ -109,15 +139,23 @@ async function checkNotifications() {
         .get();
 
       const tokens = tokensSnapshot.docs.map((doc) => doc.id);
+      console.log(`   🔑 Found ${tokens.length} FCM tokens for this user`);
+
+      if (tokens.length > 0) {
+        tokens.forEach((token, idx) => {
+          console.log(`      Token ${idx + 1}: ${token.substring(0, 20)}...`);
+        });
+      }
 
       if (tokens.length === 0) {
-        console.log(`⚠️ No tokens for user ${userId}`);
+        console.log(`   ⚠️ No tokens for user ${userId}`);
         continue;
       }
 
       // Send each due notification
       for (const notificationDoc of dueNotifications.docs) {
         const notification = notificationDoc.data();
+        console.log(`   📤 Sending notification: "${notification.body}"`);
 
         const message = {
           notification: {
@@ -135,17 +173,26 @@ async function checkNotifications() {
         };
 
         const response = await admin.messaging().sendEachForMulticast(message);
+        console.log(
+          `   ✅ Response: ${response.successCount} sent, ${response.failureCount} failed`,
+        );
+
         totalSent += response.successCount;
 
         await notificationDoc.ref.update({
           status: "sent",
           sentAt: admin.firestore.FieldValue.serverTimestamp(),
         });
+        console.log(`   ✅ Notification marked as sent in Firestore`);
 
         // Remove invalid tokens
         if (response.failureCount > 0) {
+          console.log(`   🔄 Removing ${response.failureCount} invalid tokens`);
           response.responses.forEach((resp, idx) => {
             if (!resp.success) {
+              console.log(
+                `      Removing token: ${tokens[idx].substring(0, 20)}...`,
+              );
               db.collection("users")
                 .doc(userId)
                 .collection("fcmTokens")
@@ -158,7 +205,7 @@ async function checkNotifications() {
       }
     }
 
-    console.log(`✅ Done. Sent: ${totalSent}`);
+    console.log(`\n✅ Done. Total notifications sent: ${totalSent}`);
     return totalSent;
   } catch (error) {
     console.error("❌ Error:", error);
