@@ -71,6 +71,96 @@ app.get("/trigger-notifications", async (req, res) => {
   }
 });
 
+// Debug endpoint to diagnose Firestore connection issues
+app.get("/debug-users", async (req, res) => {
+  console.log("🔍 DEBUG: Checking Firestore connection...");
+
+  const results = {
+    timestamp: new Date().toISOString(),
+    environment: {
+      projectId: process.env.FIREBASE_PROJECT_ID ? "✅ Set" : "❌ Missing",
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL ? "✅ Set" : "❌ Missing",
+      privateKey: process.env.FIREBASE_PRIVATE_KEY
+        ? "✅ Set (length: " + process.env.FIREBASE_PRIVATE_KEY.length + ")"
+        : "❌ Missing",
+    },
+    firebaseInit: false,
+    collections: [],
+    users: [],
+    errors: [],
+  };
+
+  try {
+    // Test 1: Check if Firebase is initialized
+    if (!admin.apps.length) {
+      results.errors.push("Firebase not initialized");
+      return res.status(500).json(results);
+    }
+    results.firebaseInit = true;
+
+    // Test 2: Try to list all collections
+    try {
+      const collections = await db.listCollections();
+      results.collections = collections.map((c) => c.id);
+      console.log("📚 Found collections:", results.collections);
+    } catch (err) {
+      results.errors.push(`List collections error: ${err.message}`);
+    }
+
+    // Test 3: Try to read from "users" collection specifically
+    try {
+      console.log("🔍 Attempting to read from 'users' collection...");
+      const usersSnapshot = await db.collection("users").limit(10).get();
+      results.users.count = usersSnapshot.size;
+      results.users.docs = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        hasData: !!doc.data(),
+        dataPreview: Object.keys(doc.data() || {}).slice(0, 3),
+      }));
+      console.log(`👥 Found ${usersSnapshot.size} users`);
+    } catch (err) {
+      results.errors.push(`Read users error: ${err.message}`);
+    }
+
+    // Test 4: Try alternative collection name (Users with capital U)
+    try {
+      console.log(
+        "🔍 Attempting to read from 'Users' collection (capital U)...",
+      );
+      const usersSnapshot = await db.collection("Users").limit(10).get();
+      results.usersCapital = {
+        count: usersSnapshot.size,
+        docs: usersSnapshot.docs.map((doc) => doc.id),
+      };
+      console.log(`👥 Found ${usersSnapshot.size} users in 'Users'`);
+    } catch (err) {
+      // Ignore error, just means collection doesn't exist
+    }
+
+    // Test 5: Try a simple query without auth (to test permissions)
+    try {
+      const testDoc = await db
+        .collection("users")
+        .doc("test-permissions")
+        .get();
+      results.permissions = {
+        canReadAny: !testDoc.exists
+          ? "Can read (doc doesn't exist)"
+          : "Can read",
+      };
+    } catch (err) {
+      results.permissions = {
+        canReadAny: `Cannot read: ${err.message}`,
+      };
+    }
+
+    res.status(200).json(results);
+  } catch (error) {
+    results.errors.push(`Fatal error: ${error.message}`);
+    res.status(500).json(results);
+  }
+});
+
 // The actual notification checking logic (copied from your checkNotifications.js)
 async function checkNotifications() {
   console.log("🔍 Checking for due notifications...");
@@ -219,4 +309,5 @@ app.listen(PORT, () => {
   console.log(`📝 Endpoints:`);
   console.log(`   - Health check: http://localhost:${PORT}/`);
   console.log(`   - Trigger: http://localhost:${PORT}/trigger-notifications`);
+  console.log(`   - Debug: http://localhost:${PORT}/debug-users`);
 });
