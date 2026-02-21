@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow service account (Firebase Admin SDK) to read all users and their subcollections
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.token.email == 'firebase-adminsdk-fbsvc@andromeda-78f0b.iam.gserviceaccount.com';
+      
+      // Users can only access their own user document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // User can access their own userData subcollection
+      match /userData/{dataType} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User can access their own fcmTokens subcollection (for push notifications)
+      match /fcmTokens/{token} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User can access their own pushNotifications subcollection (for scheduled reminders)
+      match /pushNotifications/{notificationId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }  
+}
