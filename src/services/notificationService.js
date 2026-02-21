@@ -134,6 +134,9 @@ class NotificationService {
   /**
    * Save FCM token to Firestore
    */
+  // In saveTokenToServer function, you can remove the 'token' field since it's already the document ID
+  // Change this part:
+
   async saveTokenToServer(token) {
     const user = auth.currentUser;
     if (!user) {
@@ -148,12 +151,12 @@ class NotificationService {
 
       const tokenRef = doc(db, "users", user.uid, "fcmTokens", token);
       await setDoc(tokenRef, {
-        token,
+        // REMOVED: token field (not needed as it's the document ID)
         userId: user.uid,
         userEmail: user.email,
         userAgent: navigator.userAgent,
-        platform: deviceType, // 👈 FIXED: Use actual device type
-        deviceId: deviceId, // 👈 Add device ID here too
+        platform: deviceType,
+        deviceId: deviceId,
         createdAt: new Date().toISOString(),
         lastUsed: new Date().toISOString(),
       });

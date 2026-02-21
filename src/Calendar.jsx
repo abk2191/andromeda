@@ -145,7 +145,7 @@ function Calendar() {
           // ✅ FIXED: Use service worker to show notification
           if (registration && Notification.permission === "granted") {
             await registration.showNotification(
-              notification.title || "🔔 Calendar Reminder",
+              notification.title || "🔔 Reminder",
               {
                 body: notification.body,
                 icon: "/andromeda/android-icon-192x192.png",
@@ -154,22 +154,22 @@ function Calendar() {
                 requireInteraction: true,
                 vibrate: [200, 100, 200],
                 data: notification.data,
-                actions: [
-                  {
-                    action: "view",
-                    title: "👁️ View Calendar",
-                  },
-                  {
-                    action: "dismiss",
-                    title: "❌ Dismiss",
-                  },
-                ],
+                // actions: [
+                //   {
+                //     action: "view",
+                //     title: "👁️ View Calendar",
+                //   },
+                //   {
+                //     action: "dismiss",
+                //     title: "❌ Dismiss",
+                //   },
+                // ],
               },
             );
           } else {
             // Fallback for desktop (though this will also fail on mobile)
             if (Notification.permission === "granted") {
-              new Notification(notification.title || "🔔 Calendar Reminder", {
+              new Notification(notification.title || "🔔 Reminder", {
                 body: notification.body,
                 icon: "/icon-192x192.png",
               });
