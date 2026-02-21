@@ -1,0 +1,36 @@
+name: Check Calendar Notifications
+
+on:
+  schedule:
+    # Runs every minute (* * * * *)
+    - cron: "*/1 * * * *"
+  # Also allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  check-notifications:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: |
+          cd functions
+          npm install firebase-admin
+
+      - name: Run notification check
+        env:
+          # Pass Firebase credentials as secrets
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          cd functions
+          node checkNotifications.js
