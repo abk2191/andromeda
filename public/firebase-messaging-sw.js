@@ -1,4 +1,4 @@
-// public/firebase-messaging-sw.js
+// public/andromeda/firebase-messaging-sw.js
 importScripts(
   "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js",
 );
@@ -23,7 +23,64 @@ firebase.initializeApp(firebaseConfig);
 // Initialize Messaging
 const messaging = firebase.messaging();
 
-// Handle background messages
+// ============================================
+// FETCH HANDLER - Keeps service worker alive
+// ============================================
+self.addEventListener("fetch", (event) => {
+  // This minimal fetch handler prevents the browser from
+  // killing the service worker when idle
+  // We just pass through all requests to the network
+  event.respondWith(fetch(event.request));
+});
+
+// ============================================
+// PUSH EVENT - Direct handler for push messages
+// ============================================
+self.addEventListener("push", (event) => {
+  console.log("[firebase-messaging-sw.js] Push event received:", event);
+
+  if (!event.data) {
+    console.log("Push event but no data");
+    return;
+  }
+
+  try {
+    const data = event.data.json();
+    console.log("Push event data:", data);
+
+    const title =
+      data.notification?.title || data.data?.title || "🔔 Calendar Reminder";
+    const options = {
+      body:
+        data.notification?.body ||
+        data.data?.body ||
+        "You have an upcoming event",
+      icon: "/andromeda/android-icon-192x192.png",
+      badge: "/andromeda/android-icon-192x192.png",
+      data: data.data || {},
+      requireInteraction: true,
+      vibrate: [200, 100, 200],
+      actions: [
+        {
+          action: "view",
+          title: "👁️ View Calendar",
+        },
+        {
+          action: "dismiss",
+          title: "❌ Dismiss",
+        },
+      ],
+    };
+
+    event.waitUntil(self.registration.showNotification(title, options));
+  } catch (e) {
+    console.error("Error parsing push event data:", e);
+  }
+});
+
+// ============================================
+// BACKGROUND MESSAGE HANDLER - Firebase specific
+// ============================================
 messaging.onBackgroundMessage((payload) => {
   console.log(
     "[firebase-messaging-sw.js] Background message received:",
@@ -71,7 +128,9 @@ messaging.onBackgroundMessage((payload) => {
   );
 });
 
-// Handle notification click
+// ============================================
+// NOTIFICATION CLICK HANDLER
+// ============================================
 self.addEventListener("notificationclick", (event) => {
   console.log(
     "[firebase-messaging-sw.js] Notification clicked:",
@@ -84,17 +143,20 @@ self.addEventListener("notificationclick", (event) => {
     return;
   }
 
-  const urlToOpen = "/";
+  // Determine URL to open - use the data from notification if available
+  const urlToOpen = event.notification.data?.url || "/andromeda/";
 
   event.waitUntil(
     clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
+        // Check if there's already a window open
         for (const client of clientList) {
           if (client.url.includes(self.location.origin) && "focus" in client) {
             return client.focus();
           }
         }
+        // If not, open a new window
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen);
         }
@@ -102,12 +164,33 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
+// ============================================
+// INSTALL HANDLER - Force activation
+// ============================================
 self.addEventListener("install", (event) => {
-  console.log("Service worker installing...");
-  self.skipWaiting(); // Force activation
+  console.log("[firebase-messaging-sw.js] Installing...");
+  // Force the waiting service worker to become the active service worker
+  self.skipWaiting();
 });
 
+// ============================================
+// ACTIVATE HANDLER - Take control immediately
+// ============================================
 self.addEventListener("activate", (event) => {
-  console.log("Service worker activating...");
-  event.waitUntil(clients.claim()); // Take control immediately
+  console.log("[firebase-messaging-sw.js] Activating...");
+  // Take control of all clients (tabs) immediately
+  event.waitUntil(clients.claim());
 });
+
+// ============================================
+// MESSAGE HANDLER - For communication from pages
+// ============================================
+self.addEventListener("message", (event) => {
+  console.log("[firebase-messaging-sw.js] Message received:", event.data);
+
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
+console.log("[firebase-messaging-sw.js] Service worker loaded and ready");
