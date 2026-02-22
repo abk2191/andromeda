@@ -101,3 +101,13 @@ self.addEventListener("notificationclick", (event) => {
       }),
   );
 });
+
+self.addEventListener("install", (event) => {
+  console.log("Service worker installing...");
+  self.skipWaiting(); // Force activation
+});
+
+self.addEventListener("activate", (event) => {
+  console.log("Service worker activating...");
+  event.waitUntil(clients.claim()); // Take control immediately
+});
