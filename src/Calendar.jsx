@@ -86,115 +86,115 @@ function Calendar() {
 
   // In Calendar.jsx, update the checkDueNotifications function:
 
-  useEffect(() => {
-    const checkDueNotifications = async () => {
-      if (!isAuthenticated) return;
+  // useEffect(() => {
+  //   const checkDueNotifications = async () => {
+  //     if (!isAuthenticated) return;
 
-      const user = auth.currentUser;
-      if (!user) return;
+  //     const user = auth.currentUser;
+  //     if (!user) return;
 
-      const now = Date.now();
-      const oneMinuteAgo = now - 60000;
+  //     const now = Date.now();
+  //     const oneMinuteAgo = now - 60000;
 
-      const thisDeviceId = localStorage.getItem("calendar_device_id");
-      if (!thisDeviceId) return;
+  //     const thisDeviceId = localStorage.getItem("calendar_device_id");
+  //     if (!thisDeviceId) return;
 
-      try {
-        const notificationsRef = collection(
-          db,
-          "users",
-          user.uid,
-          "pushNotifications",
-        );
+  //     try {
+  //       const notificationsRef = collection(
+  //         db,
+  //         "users",
+  //         user.uid,
+  //         "pushNotifications",
+  //       );
 
-        const q = query(
-          notificationsRef,
-          where("fireAt", "<=", now),
-          where("fireAt", ">=", oneMinuteAgo),
-          where("status", "==", "scheduled"),
-          where("deviceId", "==", thisDeviceId),
-        );
+  //       const q = query(
+  //         notificationsRef,
+  //         where("fireAt", "<=", now),
+  //         where("fireAt", ">=", oneMinuteAgo),
+  //         where("status", "==", "scheduled"),
+  //         where("deviceId", "==", thisDeviceId),
+  //       );
 
-        const snapshot = await getDocs(q);
+  //       const snapshot = await getDocs(q);
 
-        if (snapshot.empty) {
-          console.log(
-            "⏰ No due notifications for this device at",
-            new Date().toLocaleTimeString(),
-          );
-          return;
-        }
+  //       if (snapshot.empty) {
+  //         console.log(
+  //           "⏰ No due notifications for this device at",
+  //           new Date().toLocaleTimeString(),
+  //         );
+  //         return;
+  //       }
 
-        console.log(
-          `🔔 Found ${snapshot.size} due notifications for this device!`,
-        );
+  //       console.log(
+  //         `🔔 Found ${snapshot.size} due notifications for this device!`,
+  //       );
 
-        // Get the service worker registration
-        const registration =
-          await navigator.serviceWorker.getRegistration("/andromeda/");
+  //       // Get the service worker registration
+  //       const registration =
+  //         await navigator.serviceWorker.getRegistration("/andromeda/");
 
-        // Show notifications for each due reminder
-        snapshot.forEach(async (doc) => {
-          const notification = doc.data();
+  //       // Show notifications for each due reminder
+  //       snapshot.forEach(async (doc) => {
+  //         const notification = doc.data();
 
-          console.log(
-            "Showing notification on correct device:",
-            notification.body,
-          );
+  //         console.log(
+  //           "Showing notification on correct device:",
+  //           notification.body,
+  //         );
 
-          // ✅ FIXED: Use service worker to show notification
-          if (registration && Notification.permission === "granted") {
-            await registration.showNotification(
-              notification.title || "🔔 Reminder",
-              {
-                body: notification.body,
-                icon: "/andromeda/android-icon-192x192.png",
-                badge: "/andromeda/android-icon-192x192.png",
-                tag: notification.id,
-                requireInteraction: true,
-                vibrate: [200, 100, 200],
-                data: notification.data,
-                // actions: [
-                //   {
-                //     action: "view",
-                //     title: "👁️ View Calendar",
-                //   },
-                //   {
-                //     action: "dismiss",
-                //     title: "❌ Dismiss",
-                //   },
-                // ],
-              },
-            );
-          } else {
-            // Fallback for desktop (though this will also fail on mobile)
-            if (Notification.permission === "granted") {
-              new Notification(notification.title || "🔔 Reminder", {
-                body: notification.body,
-                icon: "/icon-192x192.png",
-              });
-            }
-          }
+  //         // ✅ FIXED: Use service worker to show notification
+  //         if (registration && Notification.permission === "granted") {
+  //           await registration.showNotification(
+  //             notification.title || "🔔 Reminder",
+  //             {
+  //               body: notification.body,
+  //               icon: "/andromeda/android-icon-192x192.png",
+  //               badge: "/andromeda/android-icon-192x192.png",
+  //               tag: notification.id,
+  //               requireInteraction: true,
+  //               vibrate: [200, 100, 200],
+  //               data: notification.data,
+  //               // actions: [
+  //               //   {
+  //               //     action: "view",
+  //               //     title: "👁️ View Calendar",
+  //               //   },
+  //               //   {
+  //               //     action: "dismiss",
+  //               //     title: "❌ Dismiss",
+  //               //   },
+  //               // ],
+  //             },
+  //           );
+  //         } else {
+  //           // Fallback for desktop (though this will also fail on mobile)
+  //           if (Notification.permission === "granted") {
+  //             new Notification(notification.title || "🔔 Reminder", {
+  //               body: notification.body,
+  //               icon: "/icon-192x192.png",
+  //             });
+  //           }
+  //         }
 
-          // Mark as sent in Firestore
-          await updateDoc(doc.ref, {
-            status: "sent",
-            sentAt: new Date().toISOString(),
-          });
-        });
-      } catch (error) {
-        console.error("Error checking notifications:", error);
-      }
-    };
+  //         // Mark as sent in Firestore
+  //         await updateDoc(doc.ref, {
+  //           status: "sent",
+  //           sentAt: new Date().toISOString(),
+  //         });
+  //       });
+  //     } catch (error) {
+  //       console.error("Error checking notifications:", error);
+  //     }
+  //   };
 
-    // Check immediately
-    checkDueNotifications();
+  //   // Check immediately
+  //   checkDueNotifications();
 
-    // Then check every 30 seconds
-    const interval = setInterval(checkDueNotifications, 30000);
+  //   // Then check every 30 seconds
+  //   const interval = setInterval(checkDueNotifications, 30000);
 
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  //   return () => clearInterval(interval);
+  // }, [isAuthenticated]);
 
   useEffect(() => {
     const initializeFCM = async () => {
