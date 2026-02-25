@@ -443,9 +443,9 @@ html.dark-theme {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 } */
 
-.month-date.has-event:hover {
+/* .month-date.has-event:hover {
   background-color: rgba(0, 0, 51, 0.7) !important;
-}
+} */
 
 /* Dark theme styles for page-text */
 .dark-theme .page-text h1 {

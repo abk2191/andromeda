@@ -1515,20 +1515,28 @@ function Calendar() {
                     style={{
                       fontSize: "12px",
                       textAlign: "center",
-
                       padding: "2px 0",
                       color: isToday
-                        ? "gold"
+                        ? "green"
                         : hasEvent
-                          ? "green"
+                          ? "white"
                           : isSunday
                             ? "red"
                             : isDarkTheme
                               ? "white"
                               : "#000033",
                       borderRadius: "8px",
+                      backgroundColor: hasEvent
+                        ? "green"
+                        : isToday
+                          ? "gold"
+                          : "none",
                       cursor: hasEvent ? "pointer" : "default",
-                      fontWeight: hasEvent ? "bold" : "normal",
+                      fontWeight: hasEvent
+                        ? "bold"
+                        : isToday
+                          ? "bold"
+                          : "normal",
                       border: hasEvent
                         ? "1px solid green"
                         : date === todayDate &&
