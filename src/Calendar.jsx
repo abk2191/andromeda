@@ -1378,9 +1378,9 @@ function Calendar() {
                         className="month-card"
                         style={{
                           backgroundColor: isDarkTheme ? "black" : "white",
-                          border: isDarkTheme
-                            ? "1px solid #1a1a1a"
-                            : "1px solid rgb(248, 247, 247)",
+                          // border: isDarkTheme
+                          //   ? "1px solid #1a1a1a"
+                          //   : "1px solid rgb(248, 247, 247)",
 
                           padding: startIndex === 0 ? "5px" : "10px",
 
