@@ -1616,7 +1616,7 @@ html {
   width: 500px;
   flex-direction: column;
   margin-top: 35px;
-  border: 1px solid rgb(242, 242, 242);
+  /* border: 1px solid rgb(242, 242, 242); */
   background-color: white;
 
   padding: 40px;
@@ -1627,7 +1627,7 @@ html {
 /* Dark theme styles for clndr-wrpr */
 .dark-theme .clndr-wrpr {
   background-color: black !important;
-  border: 1px solid #1a1a1a;
+  /* border: 1px solid #1a1a1a; */
 }
 
 .event-viewer-name {
