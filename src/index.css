@@ -632,7 +632,7 @@ html.dark-theme {
 
 /* ===== GOOGLE-STYLE NOTES LIST ===== */
 /* FIXED: Perfectly centered grid */
-.notes-list {
+/* .notes-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, 350px);
   gap: 24px;
@@ -642,7 +642,7 @@ html.dark-theme {
   overflow-x: hidden;
   justify-content: center;
   justify-items: center;
-}
+} */
 
 .evnt-btn {
   height: 48px;
@@ -2648,110 +2648,139 @@ html {
   }
 
   /* FIXED: Mobile notes list centering */
+  /* FIXED: Mobile notes list - Grid layout like Google Keep */
   .notes-list {
-    grid-template-columns: 350px;
-    gap: 16px;
-    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 8px 12px;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    max-width: 100%;
     justify-content: center;
+    align-items: start;
   }
 
   .note-item {
-    width: 350px;
+    width: 100%;
+    max-width: 100%;
   }
 
   .nw-nt-div {
+    width: 100%;
     height: auto;
-
-    width: 350px;
+    min-height: 140px;
+    max-height: 200px;
+    padding: 12px;
   }
 
   .nt-cntnt-div p {
-    -webkit-line-clamp: 6;
-  }
-
-  .notes-modal {
-    width: 95%;
-    max-height: 90vh;
-  }
-
-  .hamburger {
-    width: 40px;
-    height: 40px;
+    font-size: 14px;
+    -webkit-line-clamp: 5;
+    line-height: 1.4;
   }
 
   .dlt-nt-btn-div {
-    height: 36px;
+    height: 32px;
+    gap: 8px;
+  }
+
+  .btn-cntnr {
+    gap: 8px;
   }
 
   .dlt-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
-  .crt-nt-btn-div {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    padding: 0;
+  .color-selector {
+    width: 200px;
+    height: 75px;
+    gap: 6px;
+    left: 5%;
   }
 
+  .color-flex {
+    gap: 6px;
+  }
+
+  .color-flex div {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Pinned notes grid on mobile */
   .all-pnd-nts {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    width: 100%;
+    padding: 0 12px;
   }
 
-  .sign-out-btn h2 {
+  .all-pnd-nts .note-item {
+    width: 100%;
+  }
+
+  /* Page text adjustments */
+  .page-text h1 {
+    font-size: 24px;
+  }
+
+  .page-text-2 h2 {
     font-size: 16px;
   }
 }
 
-/* @media all and (display-mode: standalone) {
-  .brand-name {
-    margin-top: 40px;
-  }
-} */
-
-@media (max-width: 400px) {
-  .all-pnd-nts {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
+@media (max-width: 480px) {
   .notes-list {
-    grid-template-columns: 320px;
-  }
-
-  .note-item {
-    width: 320px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    padding: 6px 10px;
   }
 
   .nw-nt-div {
-    width: 320px;
+    min-height: 120px;
+    padding: 10px;
   }
 
-  .crt-nt-btn {
-    width: 320px;
+  .nt-cntnt-div p {
+    font-size: 12px;
+    -webkit-line-clamp: 4;
   }
 
-  .page-text {
-    font-size: 13px;
-    padding: 8px 12px;
+  .dlt-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 
-  .sign-out-btn h2 {
-    font-size: 16px;
+  .all-pnd-nts {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    padding: 0 10px;
   }
 }
 
+@media (max-width: 360px) {
+  .notes-list {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    padding: 6px 8px;
+  }
+
+  .nw-nt-div {
+    min-height: 110px;
+    padding: 8px;
+  }
+
+  .all-pnd-nts {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    padding: 0 8px;
+  }
+}
 @media (min-width: 1200px) {
   .notes-list {
     grid-template-columns: repeat(3, 350px);
