@@ -1119,31 +1119,31 @@ function Todo() {
 
                                     <div className="color-flex">
                                       <div
-                                        className="strict-dark"
+                                        className="light-purple"
                                         onClick={(e) =>
                                           changeBackgroundColor(
                                             note.id,
-                                            "#1a1a1a",
+                                            "#762bd1",
                                             e,
                                           )
                                         }
                                       ></div>
                                       <div
-                                        className="Navy"
+                                        className="gold"
                                         onClick={(e) =>
                                           changeBackgroundColor(
                                             note.id,
-                                            "#000033",
+                                            "gold",
                                             e,
                                           )
                                         }
                                       ></div>
                                       <div
-                                        className="deep-green"
+                                        className="ocean"
                                         onClick={(e) =>
                                           changeBackgroundColor(
                                             note.id,
-                                            "#256025",
+                                            "#31908e",
                                             e,
                                           )
                                         }
@@ -1318,21 +1318,21 @@ function Todo() {
 
                               <div className="color-flex">
                                 <div
-                                  className="strict-dark"
+                                  className="light-purple"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#1a1a1a", e)
+                                    changeBackgroundColor(note.id, "#762bd1", e)
                                   }
                                 ></div>
                                 <div
-                                  className="Navy"
+                                  className="gold"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#000033", e)
+                                    changeBackgroundColor(note.id, "gold", e)
                                   }
                                 ></div>
                                 <div
-                                  className="deep-green"
+                                  className="ocean"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#256025", e)
+                                    changeBackgroundColor(note.id, "#31908e", e)
                                   }
                                 ></div>
                               </div>
