@@ -2627,6 +2627,20 @@ html {
     left: 11%;
   }
 
+  .nw-nt-div h3 {
+    font-size: 16px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .nw-nt-div p {
+    font-size: 12px !important;
+  }
+
+  /* For the task count text inside todo cards */
+  .nw-nt-div p[style*="font-size: 14px"] {
+    font-size: 12px !important;
+  }
+
   .notes-modal {
     height: 500px;
     overflow-y: auto;
