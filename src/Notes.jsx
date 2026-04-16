@@ -711,32 +711,6 @@ function Notes() {
                                 <div className="color-selector">
                                   <div className="color-flex">
                                     <div
-                                      className="plain-blue"
-                                      onClick={(e) =>
-                                        changeBackgroundColor(
-                                          note.id,
-                                          "blue",
-                                          e,
-                                        )
-                                      }
-                                    ></div>
-                                    <div
-                                      className="red"
-                                      onClick={(e) =>
-                                        changeBackgroundColor(note.id, "red", e)
-                                      }
-                                    ></div>
-                                    <div
-                                      className="light-green"
-                                      onClick={(e) =>
-                                        changeBackgroundColor(
-                                          note.id,
-                                          "#469b46",
-                                          e,
-                                        )
-                                      }
-                                    ></div>
-                                    <div
                                       className="light-purple"
                                       onClick={(e) =>
                                         changeBackgroundColor(
@@ -795,36 +769,6 @@ function Notes() {
                                         changeBackgroundColor(
                                           note.id,
                                           "#256025",
-                                          e,
-                                        )
-                                      }
-                                    ></div>
-                                    <div
-                                      className="maroon"
-                                      onClick={(e) =>
-                                        changeBackgroundColor(
-                                          note.id,
-                                          "#1a0505",
-                                          e,
-                                        )
-                                      }
-                                    ></div>
-                                    <div
-                                      className="darkblue"
-                                      onClick={(e) =>
-                                        changeBackgroundColor(
-                                          note.id,
-                                          "#360a5e",
-                                          e,
-                                        )
-                                      }
-                                    ></div>
-                                    <div
-                                      className="deep-yellow"
-                                      onClick={(e) =>
-                                        changeBackgroundColor(
-                                          note.id,
-                                          "#646409",
                                           e,
                                         )
                                       }
@@ -955,24 +899,6 @@ function Notes() {
                           <div className="color-selector">
                             <div className="color-flex">
                               <div
-                                className="plain-blue"
-                                onClick={(e) =>
-                                  changeBackgroundColor(note.id, "blue", e)
-                                }
-                              ></div>
-                              <div
-                                className="red"
-                                onClick={(e) =>
-                                  changeBackgroundColor(note.id, "red", e)
-                                }
-                              ></div>
-                              <div
-                                className="light-green"
-                                onClick={(e) =>
-                                  changeBackgroundColor(note.id, "#469b46", e)
-                                }
-                              ></div>
-                              <div
                                 className="light-purple"
                                 onClick={(e) =>
                                   changeBackgroundColor(note.id, "#762bd1", e)
@@ -1009,24 +935,6 @@ function Notes() {
                                 className="deep-green"
                                 onClick={(e) =>
                                   changeBackgroundColor(note.id, "#256025", e)
-                                }
-                              ></div>
-                              <div
-                                className="maroon"
-                                onClick={(e) =>
-                                  changeBackgroundColor(note.id, "#1a0505", e)
-                                }
-                              ></div>
-                              <div
-                                className="darkblue"
-                                onClick={(e) =>
-                                  changeBackgroundColor(note.id, "#360a5e", e)
-                                }
-                              ></div>
-                              <div
-                                className="deep-yellow"
-                                onClick={(e) =>
-                                  changeBackgroundColor(note.id, "#646409", e)
                                 }
                               ></div>
                             </div>

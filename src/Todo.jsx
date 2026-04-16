@@ -1086,40 +1086,10 @@ function Todo() {
                                   <div className="color-selector">
                                     <div className="color-flex">
                                       <div
-                                        className="plain-blue"
-                                        onClick={(e) =>
-                                          changeBackgroundColor(
-                                            note.id,
-                                            "blue",
-                                            e,
-                                          )
-                                        }
-                                      ></div>
-                                      <div
-                                        className="red"
-                                        onClick={(e) =>
-                                          changeBackgroundColor(
-                                            todo.id,
-                                            "red",
-                                            e,
-                                          )
-                                        }
-                                      ></div>
-                                      <div
-                                        className="light-green"
-                                        onClick={(e) =>
-                                          changeBackgroundColor(
-                                            todo.id,
-                                            "#469b46",
-                                            e,
-                                          )
-                                        }
-                                      ></div>
-                                      <div
                                         className="light-purple"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            todo.id,
+                                            note.id,
                                             "#762bd1",
                                             e,
                                           )
@@ -1129,7 +1099,7 @@ function Todo() {
                                         className="gold"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            todo.id,
+                                            note.id,
                                             "gold",
                                             e,
                                           )
@@ -1139,7 +1109,7 @@ function Todo() {
                                         className="ocean"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            todo.id,
+                                            note.id,
                                             "#31908e",
                                             e,
                                           )
@@ -1152,7 +1122,7 @@ function Todo() {
                                         className="strict-dark"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            todo.id,
+                                            note.id,
                                             "#1a1a1a",
                                             e,
                                           )
@@ -1162,7 +1132,7 @@ function Todo() {
                                         className="Navy"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            todo.id,
+                                            note.id,
                                             "#000033",
                                             e,
                                           )
@@ -1172,38 +1142,8 @@ function Todo() {
                                         className="deep-green"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            todo.id,
+                                            note.id,
                                             "#256025",
-                                            e,
-                                          )
-                                        }
-                                      ></div>
-                                      <div
-                                        className="maroon"
-                                        onClick={(e) =>
-                                          changeBackgroundColor(
-                                            todo.id,
-                                            "#1a0505",
-                                            e,
-                                          )
-                                        }
-                                      ></div>
-                                      <div
-                                        className="darkblue"
-                                        onClick={(e) =>
-                                          changeBackgroundColor(
-                                            todo.id,
-                                            "#360a5e",
-                                            e,
-                                          )
-                                        }
-                                      ></div>
-                                      <div
-                                        className="deep-yellow"
-                                        onClick={(e) =>
-                                          changeBackgroundColor(
-                                            todo.id,
-                                            "#646409",
                                             e,
                                           )
                                         }
@@ -1357,39 +1297,21 @@ function Todo() {
                             <div className="color-selector">
                               <div className="color-flex">
                                 <div
-                                  className="plain-blue"
-                                  onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "blue", e)
-                                  }
-                                ></div>
-                                <div
-                                  className="red"
-                                  onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "red", e)
-                                  }
-                                ></div>
-                                <div
-                                  className="light-green"
-                                  onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#469b46", e)
-                                  }
-                                ></div>
-                                <div
                                   className="light-purple"
                                   onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#762bd1", e)
+                                    changeBackgroundColor(note.id, "#762bd1", e)
                                   }
                                 ></div>
                                 <div
                                   className="gold"
                                   onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "gold", e)
+                                    changeBackgroundColor(note.id, "gold", e)
                                   }
                                 ></div>
                                 <div
                                   className="ocean"
                                   onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#31908e", e)
+                                    changeBackgroundColor(note.id, "#31908e", e)
                                   }
                                 ></div>
                               </div>
@@ -1398,37 +1320,19 @@ function Todo() {
                                 <div
                                   className="strict-dark"
                                   onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#1a1a1a", e)
+                                    changeBackgroundColor(note.id, "#1a1a1a", e)
                                   }
                                 ></div>
                                 <div
                                   className="Navy"
                                   onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#000033", e)
+                                    changeBackgroundColor(note.id, "#000033", e)
                                   }
                                 ></div>
                                 <div
                                   className="deep-green"
                                   onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#256025", e)
-                                  }
-                                ></div>
-                                <div
-                                  className="maroon"
-                                  onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#1a0505", e)
-                                  }
-                                ></div>
-                                <div
-                                  className="darkblue"
-                                  onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#360a5e", e)
-                                  }
-                                ></div>
-                                <div
-                                  className="deep-yellow"
-                                  onClick={(e) =>
-                                    changeBackgroundColor(todo.id, "#646409", e)
+                                    changeBackgroundColor(note.id, "#256025", e)
                                   }
                                 ></div>
                               </div>

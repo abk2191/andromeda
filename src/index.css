@@ -1164,10 +1164,10 @@ html.dark-theme {
   justify-content: center;
   gap: 10px;
   height: 90px;
-  width: 250px;
+  width: 150px;
   border-radius: 8px;
   position: fixed; /* Keep as fixed for dynamic positioning */
-  z-index: 10000;
+  z-index: 10000000;
   background: white !important;
   /* box-shadow:
     0 0 15px rgba(255, 255, 255, 0.3),
@@ -2730,7 +2730,7 @@ html {
   }
 
   .color-selector {
-    width: 200px;
+    width: 120px;
     height: 75px;
     gap: 6px;
     left: 5%;
