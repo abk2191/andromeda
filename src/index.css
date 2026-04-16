@@ -2707,6 +2707,7 @@ html {
     max-width: 100%;
     justify-content: center;
     align-items: start;
+    margin-bottom: 50px;
   }
 
   .note-item {
