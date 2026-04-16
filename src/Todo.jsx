@@ -1089,7 +1089,7 @@ function Todo() {
                                         className="light-purple"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            note.id,
+                                            todo.id,
                                             "#762bd1",
                                             e,
                                           )
@@ -1099,7 +1099,7 @@ function Todo() {
                                         className="gold"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            note.id,
+                                            todo.id,
                                             "gold",
                                             e,
                                           )
@@ -1109,7 +1109,7 @@ function Todo() {
                                         className="ocean"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            note.id,
+                                            todo.id,
                                             "#31908e",
                                             e,
                                           )
@@ -1119,31 +1119,31 @@ function Todo() {
 
                                     <div className="color-flex">
                                       <div
-                                        className="light-purple"
+                                        className="strict-dark"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            note.id,
-                                            "#762bd1",
+                                            todo.id,
+                                            "#1a1a1a",
                                             e,
                                           )
                                         }
                                       ></div>
                                       <div
-                                        className="gold"
+                                        className="Navy"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            note.id,
-                                            "gold",
+                                            todo.id,
+                                            "#000033",
                                             e,
                                           )
                                         }
                                       ></div>
                                       <div
-                                        className="ocean"
+                                        className="deep-green"
                                         onClick={(e) =>
                                           changeBackgroundColor(
-                                            note.id,
-                                            "#31908e",
+                                            todo.id,
+                                            "#256025",
                                             e,
                                           )
                                         }
@@ -1299,40 +1299,40 @@ function Todo() {
                                 <div
                                   className="light-purple"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#762bd1", e)
+                                    changeBackgroundColor(todo.id, "#762bd1", e)
                                   }
                                 ></div>
                                 <div
                                   className="gold"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "gold", e)
+                                    changeBackgroundColor(todo.id, "gold", e)
                                   }
                                 ></div>
                                 <div
                                   className="ocean"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#31908e", e)
+                                    changeBackgroundColor(todo.id, "#31908e", e)
                                   }
                                 ></div>
                               </div>
 
                               <div className="color-flex">
                                 <div
-                                  className="light-purple"
+                                  className="strict-dark"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#762bd1", e)
+                                    changeBackgroundColor(todo.id, "#1a1a1a", e)
                                   }
                                 ></div>
                                 <div
-                                  className="gold"
+                                  className="Navy"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "gold", e)
+                                    changeBackgroundColor(todo.id, "#000033", e)
                                   }
                                 ></div>
                                 <div
-                                  className="ocean"
+                                  className="deep-green"
                                   onClick={(e) =>
-                                    changeBackgroundColor(note.id, "#31908e", e)
+                                    changeBackgroundColor(todo.id, "#256025", e)
                                   }
                                 ></div>
                               </div>
