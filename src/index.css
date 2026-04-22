@@ -644,6 +644,19 @@ html.dark-theme {
   justify-items: center;
 } */
 
+/* FIXED: Perfectly centered grid for notes */
+.notes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 350px);
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 25px;
+  padding: 0;
+  overflow-x: hidden;
+  justify-content: center;
+  justify-items: center;
+}
+
 .evnt-btn {
   height: 48px;
   background-color: #000033;
